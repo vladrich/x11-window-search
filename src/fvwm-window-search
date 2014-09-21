@@ -1,0 +1,99 @@
+#!/usr/bin/env ruby
+
+def mruby?
+  RUBY_ENGINE == 'mruby'
+end
+
+if mruby?
+  def __dir__
+    File.dirname __FILE__
+  end
+end
+
+$: << __dir__
+
+unless mruby?
+  require 'getoptlong'
+end
+
+require 'lib/meta'
+require 'lib/winlist'
+require 'lib/dmenu'
+
+$conf = {
+  verbose: 0,
+
+  dmenu: {
+    exe: File.join(__dir__, 'dmenu'),
+    font: '-*-terminus-medium-*-*-*-22-*-*-*-*-*-*-*',
+    lines: 10
+  },
+
+  winlist: {
+    iconified: true,
+    pageonly: false,
+    fitler_dir: File.join(__dir__, 'etc')
+  }
+}
+
+def usage opts = nil
+  puts "Usage: #{File.basename $0} [options]"
+
+  if opts
+    puts "Options:"
+    opts.each { |idx| puts "  #{idx[0]}" }
+  end
+end
+
+
+
+opts = [
+        [ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+        [ '--verbose', '-v', GetoptLong::NO_ARGUMENT ],
+        [ '--version', '-V', GetoptLong::NO_ARGUMENT ],
+        [ '--font', GetoptLong::REQUIRED_ARGUMENT ],
+        [ '--dmenu', GetoptLong::REQUIRED_ARGUMENT ],
+        [ '--lines', '-l', GetoptLong::REQUIRED_ARGUMENT ],
+        [ '--filter-dir', GetoptLong::REQUIRED_ARGUMENT ],
+        [ '--no-iconified', GetoptLong::NO_ARGUMENT ],
+        [ '--pageonly', GetoptLong::NO_ARGUMENT ],
+       ]
+optparser = GetoptLong.new(*opts)
+
+begin
+  optparser.each do |opt, arg|
+    case opt
+    when '--help'
+      usage opts
+      exit 0
+    when '--verbose'
+      $conf[:verbose] += 1
+    when '--dmenu'
+      $conf[:dmenu][:exe] = arg
+    when '--font'
+      $conf[:dmenu][:font] = arg
+    when '--lines'
+      $conf[:dmenu][:lines] = arg
+    when '--filter-dir'
+      $conf[:winlist][:filter_dir] = arg
+    when '--no-iconofied'
+      $conf[:winlist][:iconified] = false
+    when '--no-iconofied'
+      $conf[:winlist][:pageonly] = true
+    when '--version'
+      puts '%-14s: %s %s' % ['Name', FvwmWindowSearch::Meta::NAME, FvwmWindowSearch::Meta::VERSION]
+      puts '%-14s: %s %s' % ['Engine', RUBY_ENGINE, mruby? ? MRUBY_VERSION : RUBY_VERSION]
+      puts '%-14s: %s' % ['Configuration', $conf]
+      puts '%-14s: %s' % ['Fvwm', ENV['FVWM_USERDIR'] ? 'Yes' : 'No']
+      exit
+    end
+  end
+rescue GetoptLong::Error
+  # GetoptLong will still complain independently
+  exit 1
+end
+
+#winlist = WinList.new
+#
+#menu = Dmenu.new $conf[:dmenu]
+#menu.show (winlist.get $conf[:winlist])
