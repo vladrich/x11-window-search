@@ -11,6 +11,7 @@ patch: dmenu
 
 dmenu:
 	git clone git://git.suckless.org/dmenu
+	cd $@ && git checkout 13a529ce63364544bdc851dfd5d3aa2ef8740914
 
 .PHONY: clean
 clean:
