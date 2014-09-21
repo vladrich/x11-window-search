@@ -4,21 +4,51 @@ require '../lib/winlist'
 class TestWinList < $testunit_class
 
   def setup
-    @winlist = WinList.new
+    WinList.send(:alias_method, :raw_orig, :raw)
+    @fake_raw = -> do
+      [
+       '0xa0000b "FvwmWharf": ("FvwmWharf" "FvwmWharf")  64x320+0+0  +1536+580',
+       '0x2bc9371 "- [alex@fedora.9bf016]: winlist.rb": ("emacs" "Emacs")  672x725+0+0  +859+149',
+       '0x3e0000f "mutt": ("mutt" "XTerm")  644x692+0+0  +-926+-804',
+       '0x60822e (has no name): ()  5x788+0+23  +-1391+-843',
+       '0x2bcd688 "emacs": ("emacs" "Emacs")  260x401+1229+172  +1229+172',
+       '0x2400016 "Balloon": ("balloon" "Balloon")  1x1+0+0  +0+0',
+       '0x300003e "Chromium clipboard": ()  10x10+-100+-100  +-100+-100',
+       '0x80003f "vmware-user": ()  10x10+-100+-100  +-100+-100',
+      ]
+    end
   end
 
   def teardown
+    WinList.send(:alias_method, :raw, :raw_orig)
   end
 
+  # requires X11
   def test_parse
-    assert @winlist.raw.size > 0
+    wl = WinList.new
+    assert wl.raw.size > 0
 
-    @winlist.parse
-    assert @winlist.entries.size > 0
-#    @winlist.entries.each do |idx|
+    wl.parse
+    assert wl.entries.size > 0
+#    wl.entries.each do |idx|
 #      puts idx.to_s
 ##      puts "#{idx} #{idx.instance_variable_get '@dimensions'}"
 #    end
+  end
+
+  def test_get
+
+    WinList.send :define_method, :raw, &@fake_raw
+
+    wl = WinList.new
+    assert_equal 3, wl.get.size
+    assert_equal 'FvwmWharf, FvwmWharf, [Y], 0xa0000b', wl.get[0].to_s
+    assert_equal '- [alex@fedora.9bf016]: winlist.rb, Emacs, [Y], 0x2bc9371', wl.get[1].to_s
+    assert_equal 'mutt, XTerm, [ ], 0x3e0000f', wl.get[2].to_s
+
+    assert_equal 2, wl.get(pageonly: true).size
+    assert_equal 'FvwmWharf, FvwmWharf, [Y], 0xa0000b', wl.get(pageonly: true)[0].to_s
+    assert_equal '- [alex@fedora.9bf016]: winlist.rb, Emacs, [Y], 0x2bc9371', wl.get(pageonly: true)[1].to_s
   end
 
 end

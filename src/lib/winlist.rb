@@ -1,4 +1,4 @@
-# 0x2400018 "FvwmTabs": ("fvwmTabs" "FvwmTabs")  1x1+0+0  +0+0
+# 0xa0000b "FvwmWharf": ("FvwmWharf" "FvwmWharf")  64x320+0+0  +1536+580
 # 0x2bc9371 "- [alex@fedora.9bf016]: winlist.rb": ("emacs" "Emacs")  672x725+0+0  +859+149
 # 0x3e0000f "mutt": ("mutt" "XTerm")  644x692+0+0  +-926+-804
 #
@@ -121,6 +121,7 @@ class WinList
 
   attr_reader :entries
 
+  # fake it in tests
   def raw
     return [] unless (data = `xwininfo -root -tree`)
     data.split("\n").select do |idx|
@@ -136,6 +137,32 @@ class WinList
     end
 
     @entries
+  end
+
+  def get opt = {}
+    parse
+
+    @entries.select do |idx|
+      if opt[:pageonly] && !idx.onpage?
+        false
+      elsif in_include_list opt[:fitler_dir], idx
+        true
+      elsif in_exclude_list opt[:fitler_dir], idx
+        false
+      else
+        true
+      end
+    end
+  end
+
+  # TODO
+  def in_include_list filter_dir, entry
+    false
+  end
+
+  # TODO
+  def in_exclude_list filter_dir, entry
+    false
   end
 
 end
