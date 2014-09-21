@@ -15,6 +15,10 @@ class TestWinList < $testunit_class
 
     @winlist.parse
     assert @winlist.entries.size > 0
+#    @winlist.entries.each do |idx|
+#      puts idx.to_s
+##      puts "#{idx} #{idx.instance_variable_get '@dimensions'}"
+#    end
   end
 
 end
@@ -75,6 +79,12 @@ class TestWinListEntry < $testunit_class
     assert_equal 'has no name, , [ ], 0x60822e', @has_no_name.to_s
     assert_equal 'FVWM, FVWM, [ ], 0x60001a', @fvwm.to_s
     assert_equal '- [alex@fedora.9bf016]: winlist.rb, Emacs, [Y], 0x2bc9371', @emacs_good.to_s
+  end
+
+  def test_useful
+    assert_equal false, @has_no_name.useful?
+    assert_equal false, @fvwm.useful?
+    assert_equal true, @emacs_good.useful?
   end
 
 end

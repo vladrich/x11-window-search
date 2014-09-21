@@ -99,8 +99,8 @@ class WinListEntry
 
   def useful?
     return false unless @matchdata
-    return false if x_rel == 0 || y_rel == 0
     return false if width == 0 || height == 0
+    return false if (x == x_rel) && (y == y_rel)
     return false unless x11class
 
     true
