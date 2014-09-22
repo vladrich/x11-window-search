@@ -135,7 +135,8 @@ class WinList
 
     begin
       @filter = WinListFilter.new @opt[:filter_dir]
-    rescue
+    rescue Errno::ENOENT
+      $stderr.puts $! if @opt[:verbose] > 0
       @filter = nil
     end
   end

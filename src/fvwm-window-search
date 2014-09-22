@@ -32,7 +32,8 @@ $conf = {
   winlist: {
     iconified: true,
     pageonly: false,
-    fitler_dir: File.join(__dir__, 'etc')
+    filter_dir: File.join(__dir__, 'etc'),
+    verbose: 0
   }
 }
 
@@ -74,6 +75,7 @@ begin
       exit 0
     when '--verbose'
       $conf[:verbose] += 1
+      $conf[:winlist][:verbose] = $conf[:verbose]
     when '--dmenu'
       $conf[:dmenu][:exe] = arg
     when '--font'
