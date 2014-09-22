@@ -69,6 +69,8 @@ class TestWinListEntry < $testunit_class
     @has_no_name = WinListEntry.new '0x60822e (has no name): ()  5x788+0+23  +-1391+-843'
     @emacs_good = WinListEntry.new '0x2bc9371 "- [alex@fedora.9bf016]: winlist.rb": ("emacs" "Emacs")  672x725+0+0  +859+149'
     @fvwm = WinListEntry.new '0x60001a "FVWM": ("fvwm" "FVWM")  10x10+-10+-10  +-10+-10'
+    @stardict_good = WinListEntry.new '0x3a0006f "StarDict": ("stardict" "Stardict")  583x554+0+0  +-1595+-559'
+    @stardict_bad = WinListEntry.new '0x3a00076 "StarDict": ("stardict" "Stardict")  24x24+8+28  +222+33'
   end
 
   def test_empty
@@ -126,6 +128,9 @@ class TestWinListEntry < $testunit_class
     assert_equal false, @has_no_name.useful?
     assert_equal false, @fvwm.useful?
     assert_equal true, @emacs_good.useful?
+
+    assert_equal true, @stardict_good.useful?
+    assert_equal false, @stardict_bad.useful?
   end
 
 end
