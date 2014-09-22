@@ -3,6 +3,8 @@ DEST ?= $(FVWM_USERDIR)/fvwm-window-search
 .PHONY: help
 help:
 	@echo "make compile    # clone & compile dmenu"
+	@echo "make clean      # rm dmenu repo"
+	@echo
 	@echo "make install    # install program to $(DEST)"
 	@echo "make uninstall  # rm $(DEST) (be careful!)"
 	@echo
@@ -31,3 +33,7 @@ uninstall: check
 .PHONY: compile
 compile:
 	$(MAKE) -C dmenu
+
+.PHONY: clean
+clean:
+	$(MAKE) -C dmenu clean
