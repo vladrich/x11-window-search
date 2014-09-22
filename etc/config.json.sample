@@ -1,9 +1,9 @@
 {
-  :"dmenu": {
+  "dmenu": {
     "exe": "../dmenu/dmenu/dmenu",
     "font": "-*-terminus-bold-r-*-*-24-*-*-*-*-*-*-*",
     "lines": 8,
-    "selhook": "FvwmCommand \\\"WindowId \\`echo %s | awk -F, '{print \\$NF}'\\` Raise\\\""
+    "selhook": "xdotool windowraise \\`echo %s | awk -F, '{print \\$NF}'\\`"
   },
   "winlist": {
     "pageonly": true,
