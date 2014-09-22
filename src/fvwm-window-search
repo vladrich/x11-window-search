@@ -33,7 +33,6 @@ $conf = {
   },
 
   'winlist' => {
-    'iconified' => true,
     'pageonly' => false,
     'filter_dir' => File.join(__dir__, 'etc'),
     'verbose' => 0,
@@ -72,7 +71,6 @@ opts = [
         [ '--dmenu', GetoptLong::REQUIRED_ARGUMENT ],
         [ '--lines', '-l', GetoptLong::REQUIRED_ARGUMENT ],
         [ '--filter-dir', GetoptLong::REQUIRED_ARGUMENT ],
-        [ '--no-iconified', GetoptLong::NO_ARGUMENT ],
         [ '--pageonly', GetoptLong::NO_ARGUMENT ],
         [ '--format', GetoptLong::REQUIRED_ARGUMENT ],
         [ '--selhook', GetoptLong::REQUIRED_ARGUMENT ],
@@ -96,10 +94,6 @@ begin
       $conf['dmenu']['lines'] = arg.to_i
     when '--filter-dir'
       $conf['winlist']['filter_dir'] = arg
-    when '--no-iconified'
-      $conf['winlist']['iconified'] = false
-      $stderr.puts "--no-iconofied isn't implemented"
-      exit 1
     when '--pageonly'
       $conf['winlist']['pageonly'] = true
     when '--format'
