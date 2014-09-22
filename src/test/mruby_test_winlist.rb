@@ -1,4 +1,5 @@
 require './helper'
+require '../lib/filter'
 require '../lib/winlist'
 
 class TestWinList < $testunit_class
@@ -46,9 +47,10 @@ class TestWinList < $testunit_class
     assert_equal '- [alex@fedora.9bf016]: winlist.rb, Emacs, [Y], 0x2bc9371', wl.get[1].to_s
     assert_equal 'mutt, XTerm, [ ], 0x3e0000f', wl.get[2].to_s
 
-    assert_equal 2, wl.get(pageonly: true).size
-    assert_equal 'FvwmWharf, FvwmWharf, [Y], 0xa0000b', wl.get(pageonly: true)[0].to_s
-    assert_equal '- [alex@fedora.9bf016]: winlist.rb, Emacs, [Y], 0x2bc9371', wl.get(pageonly: true)[1].to_s
+    wl = WinList.new(pageonly: true)
+    assert_equal 2, wl.get.size
+    assert_equal 'FvwmWharf, FvwmWharf, [Y], 0xa0000b', wl.get[0].to_s
+    assert_equal '- [alex@fedora.9bf016]: winlist.rb, Emacs, [Y], 0x2bc9371', wl.get[1].to_s
   end
 
 end

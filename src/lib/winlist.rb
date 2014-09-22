@@ -115,8 +115,12 @@ end
 
 class WinList
 
-  def initialize
+  def initialize opt = {}
     @entries = []
+    @opt = opt
+    @filter = WinListFilter.new @opt[:filter_dir]
+  rescue
+    @filter = nil
   end
 
   attr_reader :entries
@@ -139,30 +143,19 @@ class WinList
     @entries
   end
 
-  def get opt = {}
+  def get
     parse
 
+    # filter out entries
     @entries.select do |idx|
-      if opt[:pageonly] && !idx.onpage?
+      if @opt[:pageonly] && !idx.onpage?
         false
-      elsif in_include_list opt[:fitler_dir], idx
-        true
-      elsif in_exclude_list opt[:fitler_dir], idx
+      elsif @filter && @filter.match(idx)
         false
       else
         true
       end
     end
-  end
-
-  # TODO
-  def in_include_list filter_dir, entry
-    false
-  end
-
-  # TODO
-  def in_exclude_list filter_dir, entry
-    false
   end
 
 end
