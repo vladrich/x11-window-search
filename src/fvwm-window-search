@@ -33,10 +33,9 @@ $conf = {
   },
 
   'winlist' => {
-    'pageonly' => false,
     'filter_dir' => File.join(__dir__, 'etc'),
     'verbose' => 0,
-    'format' => '%-100s | %-20s %s, %s',
+    'format' => '%-100s | %-20s, %s',
   }
 }
 
@@ -55,11 +54,17 @@ def usage opts = nil
   end
 end
 
+def merge_rec a, b
+  a.merge(b) {|key, a_item, b_item| merge_rec a_item, b_item }
+rescue
+  b
+end
+
 
 
 # load config values
 begin
-  $conf.merge! JSON.parse File.read File.join(__dir__, 'etc', 'config.json')
+  $conf = merge_rec $conf, JSON.parse(File.read File.join __dir__, 'etc', 'config.json')
 rescue Errno::ENOENT
 end
 
@@ -71,7 +76,6 @@ opts = [
         [ '--dmenu', GetoptLong::REQUIRED_ARGUMENT ],
         [ '--lines', '-l', GetoptLong::REQUIRED_ARGUMENT ],
         [ '--filter-dir', GetoptLong::REQUIRED_ARGUMENT ],
-        [ '--pageonly', GetoptLong::NO_ARGUMENT ],
         [ '--format', GetoptLong::REQUIRED_ARGUMENT ],
         [ '--selhook', GetoptLong::REQUIRED_ARGUMENT ],
        ]
@@ -94,8 +98,6 @@ begin
       $conf['dmenu']['lines'] = arg.to_i
     when '--filter-dir'
       $conf['winlist']['filter_dir'] = arg
-    when '--pageonly'
-      $conf['winlist']['pageonly'] = true
     when '--format'
       $conf['winlist']['format'] = arg
     when '--selhook'

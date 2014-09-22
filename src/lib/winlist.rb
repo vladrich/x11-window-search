@@ -13,7 +13,7 @@ class WinListEntry
     @matchdata = nil
     @dimensions = {}
     @opt = opt
-    @opt['format'] ||= '%s, %s, %s, %s'
+    @opt['format'] ||= '%s, %s, %s'
 
     if rawline
       @matchdata = rawline.match(/^([x0-9a-f]+)\s+["\(](.+)["\)]:\s+\((.*)\)\s+([x0-9+-]+)\s+([0-9+-]+)$/)
@@ -94,11 +94,6 @@ class WinListEntry
     @dimensions[:y_rel]
   end
 
-  def onpage?
-    return false if x < 0 || y < 0
-    true
-  end
-
   def useful?
     return false unless @matchdata
     return false if width == 0 || height == 0
@@ -110,8 +105,7 @@ class WinListEntry
   end
 
   def to_s
-    page = onpage? ? "[Y]" : "[ ]"
-    @opt['format'] % [name, x11class, page, x11id]
+    @opt['format'] % [name, x11class, x11id]
   end
 
 end
@@ -171,9 +165,7 @@ class WinList
 
     # filter out entries
     @entries.select do |idx|
-      if @opt['pageonly'] && !idx.onpage?
-        false
-      elsif @filter && @filter.match(idx)
+      if @filter && @filter.match(idx)
         false
       else
         true

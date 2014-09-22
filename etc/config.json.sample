@@ -6,8 +6,7 @@
     "selhook": "xdotool windowraise \\`echo %s | awk -F, '{print \\$NF}'\\`"
   },
   "winlist": {
-    "pageonly": true,
     "filter_dir": "../etc",
-    "format": "%-90s | %-20s %s, %s"
+    "format": "%-90s | %-20s, %s"
   }
 }

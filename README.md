@@ -55,10 +55,6 @@ or you are running a different WM, use
 		# pause				cool search of all windows
 		Key Pause A	 N Exec exec $FVWM_USERDIR/fvwm-window-search/fvwm-window-search
 
-		# shift-pause		cool search of page-only windows
-        Key Pause A  S Exec exec $FVWM_USERDIR/fvwm-window-search/fvwm-window-search --pageonly
-
-
 ## Customization
 
 Debug hints:
@@ -71,8 +67,6 @@ Debug hints:
 
 In `$FVWM_USERDIR/fvwm-window-search` directory will be
 `etc/config.json.sample` file. Rename it to `etc/config.json`.
-
-* `pageonly` means list only windows that are now on your virtual page.
 
 * `selhook` is a command that dmenu runs after each selection. It must
   contain `%s` where dmenu will insert a (shell quoted) selected
