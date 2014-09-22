@@ -13,7 +13,7 @@ class WinListEntry
     @matchdata = nil
     @dimensions = {}
     @opt = opt
-    @opt[:format] ||= '%s, %s, %s, %s'
+    @opt['format'] ||= '%s, %s, %s, %s'
 
     if rawline
       @matchdata = rawline.match(/^([x0-9a-f]+)\s+["\(](.+)["\)]:\s+\((.*)\)\s+([x0-9+-]+)\s+([0-9+-]+)$/)
@@ -111,7 +111,7 @@ class WinListEntry
 
   def to_s
     page = onpage? ? "[Y]" : "[ ]"
-    @opt[:format] % [name, x11class, page, x11id]
+    @opt['format'] % [name, x11class, page, x11id]
   end
 
 end
@@ -135,13 +135,13 @@ class WinList
   def initialize opt = {}
     @entries = []
     @opt = opt
-    @opt[:verbose] ||= 0
-    @opt[:filter_dir] ||= ''
+    @opt['verbose'] ||= 0
+    @opt['filter_dir'] ||= ''
 
     begin
-      @filter = WinListFilter.new @opt[:filter_dir]
+      @filter = WinListFilter.new @opt['filter_dir']
     rescue Errno::ENOENT
-      $stderr.puts $! if @opt[:verbose] > 0
+      $stderr.puts $! if @opt['verbose'] > 0
       @filter = nil
     end
   end
@@ -171,7 +171,7 @@ class WinList
 
     # filter out entries
     @entries.select do |idx|
-      if @opt[:pageonly] && !idx.onpage?
+      if @opt['pageonly'] && !idx.onpage?
         false
       elsif @filter && @filter.match(idx)
         false

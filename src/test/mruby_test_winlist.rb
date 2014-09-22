@@ -50,12 +50,12 @@ class TestWinList < $testunit_class
     assert_equal '- [alex@fedora.9bf016]: winlist.rb, Emacs, [Y], 0x2bc9371', wl.get[1].to_s
     assert_equal 'mutt, XTerm, [ ], 0x3e0000f', wl.get[2].to_s
 
-    wl = WinList.new(pageonly: true)
+    wl = WinList.new('pageonly' => true)
     assert_equal 4, wl.get.size
     assert_equal 'FvwmWharf, FvwmWharf, [Y], 0xa0000b', wl.get[0].to_s
     assert_equal '- [alex@fedora.9bf016]: winlist.rb, Emacs, [Y], 0x2bc9371', wl.get[1].to_s
 
-    wl = WinList.new(filter_dir: 'data/01')
+    wl = WinList.new('filter_dir' => 'data/01')
     assert_equal 3, wl.get.size
     assert_equal 'mutt, XTerm, [ ], 0x3e0000f', wl.get[0].to_s
     assert_equal 'Desk 0, FvwmPager, [Y], 0x1000005', wl.get[1].to_s
