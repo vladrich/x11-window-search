@@ -9,9 +9,11 @@
 # 0x80003f "vmware-user": ()  10x10+-100+-100  +-100+-100
 class WinListEntry
 
-  def initialize rawline
+  def initialize rawline, opt = {}
     @matchdata = nil
     @dimensions = {}
+    @opt = opt
+    @opt[:format] ||= '%s, %s, %s, %s'
 
     if rawline
       @matchdata = rawline.match(/^([x0-9a-f]+)\s+["\(](.+)["\)]:\s+\((.*)\)\s+([x0-9+-]+)\s+([0-9+-]+)$/)
@@ -109,7 +111,7 @@ class WinListEntry
 
   def to_s
     page = onpage? ? "[Y]" : "[ ]"
-    [name, x11class, page, x11id].join ", "
+    @opt[:format] % [name, x11class, page, x11id]
   end
 
 end
@@ -157,7 +159,7 @@ class WinList
   def parse
     @entries = []
     raw.each do |idx|
-      e = WinListEntry.new(idx)
+      e = WinListEntry.new(idx, @opt)
       @entries << e if e.useful?
     end
 

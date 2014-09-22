@@ -28,14 +28,15 @@ $conf = {
     exe: File.join(__dir__, 'dmenu'),
     font: '-*-terminus-bold-r-*-*-18-*-*-*-*-*-*-*',
     lines: 10,
-    selhook: "FvwmCommand \\\"WindowId \\`echo %s | awk -F, '{print \\$NF}'\\` FuncFvwmSelectWindow\\\""
+    selhook: "FvwmCommand \\\"WindowId \\`echo %s | awk -F, '{print \\$NF}'\\` FuncFvwmRaiseWindow\\\""
   },
 
   winlist: {
     iconified: true,
     pageonly: false,
     filter_dir: File.join(__dir__, 'etc'),
-    verbose: 0
+    verbose: 0,
+    format: '%-100s | %-20s %s, %s',
   }
 }
 
@@ -66,6 +67,7 @@ opts = [
         [ '--filter-dir', GetoptLong::REQUIRED_ARGUMENT ],
         [ '--no-iconified', GetoptLong::NO_ARGUMENT ],
         [ '--pageonly', GetoptLong::NO_ARGUMENT ],
+        [ '--format', GetoptLong::REQUIRED_ARGUMENT ],
        ]
 optparser = GetoptLong.new(*opts)
 
@@ -92,6 +94,8 @@ begin
       exit 1
     when '--pageonly'
       $conf[:winlist][:pageonly] = true
+    when '--format'
+      $conf[:winlist][:format] = arg
     when '--version'
       puts '%-14s: %s %s' % ['Name', FvwmWindowSearch::Meta::NAME, FvwmWindowSearch::Meta::VERSION]
       puts '%-14s: %s %s' % ['Engine', RUBY_ENGINE, mruby? ? MRUBY_VERSION : RUBY_VERSION]
