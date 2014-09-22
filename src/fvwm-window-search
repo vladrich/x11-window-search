@@ -14,9 +14,11 @@ $: << __dir__
 
 unless mruby?
   require 'getoptlong'
+  require 'shellwords'
 end
 
 require 'lib/meta'
+require 'lib/filter'
 require 'lib/winlist'
 
 $conf = {
@@ -84,9 +86,11 @@ begin
       $conf[:dmenu][:lines] = arg.to_i
     when '--filter-dir'
       $conf[:winlist][:filter_dir] = arg
-    when '--no-iconofied'
+    when '--no-iconified'
       $conf[:winlist][:iconified] = false
-    when '--no-iconofied'
+      $stderr.puts "--no-iconofied isn't implemented"
+      exit 1
+    when '--pageonly'
       $conf[:winlist][:pageonly] = true
     when '--version'
       puts '%-14s: %s %s' % ['Name', FvwmWindowSearch::Meta::NAME, FvwmWindowSearch::Meta::VERSION]
