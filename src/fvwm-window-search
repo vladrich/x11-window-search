@@ -68,6 +68,7 @@ opts = [
         [ '--no-iconified', GetoptLong::NO_ARGUMENT ],
         [ '--pageonly', GetoptLong::NO_ARGUMENT ],
         [ '--format', GetoptLong::REQUIRED_ARGUMENT ],
+        [ '--selhook', GetoptLong::REQUIRED_ARGUMENT ],
        ]
 optparser = GetoptLong.new(*opts)
 
@@ -96,6 +97,8 @@ begin
       $conf[:winlist][:pageonly] = true
     when '--format'
       $conf[:winlist][:format] = arg
+    when '--selhook'
+      $conf[:dmenu][:selhook] = arg
     when '--version'
       puts '%-14s: %s %s' % ['Name', FvwmWindowSearch::Meta::NAME, FvwmWindowSearch::Meta::VERSION]
       puts '%-14s: %s %s' % ['Engine', RUBY_ENGINE, mruby? ? MRUBY_VERSION : RUBY_VERSION]
