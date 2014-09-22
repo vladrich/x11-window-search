@@ -132,6 +132,8 @@ class WinList
   def initialize opt = {}
     @entries = []
     @opt = opt
+    @opt[:verbose] ||= 0
+    @opt[:filter_dir] ||= ''
 
     begin
       @filter = WinListFilter.new @opt[:filter_dir]
