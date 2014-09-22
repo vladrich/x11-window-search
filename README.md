@@ -1,11 +1,9 @@
 # fvwm-window-search
 
-Incremental search for a window title/class & immediate switch to the
-selected window *during the search*.
+Incremental window search & immediate switch to the selected window
+*during the search*.
 
 Uses a patched version of dmenu as a GUI.
-
-[TODO: link to a youtube video]
 
 ![A screenshot of running fvwm-window-search](https://raw.github.com/gromnitsky/fvwm-window-search/master/screnshot1.png)
 
@@ -20,7 +18,8 @@ Uses a patched version of dmenu as a GUI.
 * `xwininfo` utility (comes w/ `xorg-x11-utils` Fedora package)
 * A patched dmenu (see below).
 * An ability to programmatically control windows either through WM or
-  an external tool like xdotool.
+  w/ an external tool like xdotool.
+* Linux.
 
 ## General Installation
 
@@ -28,7 +27,7 @@ Uses a patched version of dmenu as a GUI.
 
 It will clone dmenu repo, patch it, compile it, copy all required files
 to `$FVWM_USERDIR/fvwm-window-search`. If you don't have FVWM installed
-or you are running under different WM, use
+or you are running a different WM, use
 
 	% make install DEST=$HOME/software/fvwm-window-search
 
@@ -65,7 +64,7 @@ or you are running under different WM, use
 Debug hints:
 
 * Run w/ `-v` flag.
-* If the last CLO is `-V` fvwm-window-search will display its up-to-day
+* If the last CLO is `-V`, fvwm-window-search will display its up-to-date
   configuration & exit.
 
 ### Config file
@@ -73,7 +72,7 @@ Debug hints:
 In `$FVWM_USERDIR/fvwm-window-search` directory will be
 `etc/config.json.sample` file. Rename it to `etc/config.json`.
 
-* `pageonly` means list only windows that on your virtual page now.
+* `pageonly` means list only windows that are now on your virtual page.
 
 * `selhook` is a command that dmenu runs after each selection. It must
   contain `%s` where dmenu will insert a (shell quoted) selected
@@ -99,12 +98,12 @@ directory there are 2 files for that:
 
 * Tested only with FVWM.
 * No distinction between normal & iconified windows.
-
-:circus_tent:
+* :circus_tent:
 
 ## TODO
 
 * Compile with mruby & incorporate the result into dmenu.
+* Make a screencast, ггг.
 
 ## License
 
