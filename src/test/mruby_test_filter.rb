@@ -1,6 +1,5 @@
 require './helper'
 require '../lib/filter'
-require '../lib/winlist'
 
 class TestFilter < $testunit_class
 

@@ -113,6 +113,20 @@ class WinListEntry
 
 end
 
+class WinListFilter
+
+  def initialize filter_dir
+    @x11class = Filter.new(File.join filter_dir, 'class.filter')
+    @name = Filter.new(File.join filter_dir, 'name.filter')
+  end
+
+  def match entry
+    return true if @x11class.match entry.x11class
+    @name.match entry.name
+  end
+
+end
+
 class WinList
 
   def initialize opt = {}
