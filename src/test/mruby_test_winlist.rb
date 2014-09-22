@@ -11,6 +11,9 @@ class TestWinList < $testunit_class
        '0xa0000b "FvwmWharf": ("FvwmWharf" "FvwmWharf")  64x320+0+0  +1536+580',
        '0x2bc9371 "- [alex@fedora.9bf016]: winlist.rb": ("emacs" "Emacs")  672x725+0+0  +859+149',
        '0x3e0000f "mutt": ("mutt" "XTerm")  644x692+0+0  +-926+-804',
+       '0x1000005 "Desk 0": ("FvwmPager" "FvwmPager")  199x117+0+0  +5+5',
+       '0x2bc9371 "- [alex@fedora.9bf016]: foobar": ("emacs" "Emacs")  672x725+0+0  +859+149',
+
        '0x60822e (has no name): ()  5x788+0+23  +-1391+-843',
        '0x2bcd688 "emacs": ("emacs" "Emacs")  260x401+1229+172  +1229+172',
        '0x2400016 "Balloon": ("balloon" "Balloon")  1x1+0+0  +0+0',
@@ -42,15 +45,21 @@ class TestWinList < $testunit_class
     WinList.send :define_method, :raw, &@fake_raw
 
     wl = WinList.new
-    assert_equal 3, wl.get.size
+    assert_equal 5, wl.get.size
     assert_equal 'FvwmWharf, FvwmWharf, [Y], 0xa0000b', wl.get[0].to_s
     assert_equal '- [alex@fedora.9bf016]: winlist.rb, Emacs, [Y], 0x2bc9371', wl.get[1].to_s
     assert_equal 'mutt, XTerm, [ ], 0x3e0000f', wl.get[2].to_s
 
     wl = WinList.new(pageonly: true)
-    assert_equal 2, wl.get.size
+    assert_equal 4, wl.get.size
     assert_equal 'FvwmWharf, FvwmWharf, [Y], 0xa0000b', wl.get[0].to_s
     assert_equal '- [alex@fedora.9bf016]: winlist.rb, Emacs, [Y], 0x2bc9371', wl.get[1].to_s
+
+    wl = WinList.new(filter_dir: 'data/01')
+    assert_equal 3, wl.get.size
+    assert_equal 'mutt, XTerm, [ ], 0x3e0000f', wl.get[0].to_s
+    assert_equal 'Desk 0, FvwmPager, [Y], 0x1000005', wl.get[1].to_s
+    assert_equal '- [alex@fedora.9bf016]: foobar, Emacs, [Y], 0x2bc9371', wl.get[2].to_s
   end
 
 end

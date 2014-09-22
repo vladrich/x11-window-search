@@ -132,9 +132,12 @@ class WinList
   def initialize opt = {}
     @entries = []
     @opt = opt
-    @filter = WinListFilter.new @opt[:filter_dir]
-  rescue
-    @filter = nil
+
+    begin
+      @filter = WinListFilter.new @opt[:filter_dir]
+    rescue
+      @filter = nil
+    end
   end
 
   attr_reader :entries
