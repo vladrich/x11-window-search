@@ -7,6 +7,8 @@ Uses a patched version of dmenu as a GUI.
 
 [TODO: link to a youtube video]
 
+![A screenshot of running fvwm-window-search](https://raw.github.com/gromnitsky/fvwm-window-search/master/screnshot1.png)
+
 ## Features
 
 * Works w/ any X11 window manager (defaults are for FVWM, though).
@@ -97,6 +99,8 @@ directory there are 2 files for that:
 
 * Tested only with FVWM.
 * No distinction between normal & iconified windows.
+
+:circus_tent:
 
 ## TODO
 
