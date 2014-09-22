@@ -18,15 +18,15 @@ end
 
 require 'lib/meta'
 require 'lib/winlist'
-require 'lib/dmenu'
 
 $conf = {
   verbose: 0,
 
   dmenu: {
     exe: File.join(__dir__, 'dmenu'),
-    font: '-*-terminus-medium-*-*-*-22-*-*-*-*-*-*-*',
-    lines: 10
+    font: '-*-terminus-bold-r-*-*-18-*-*-*-*-*-*-*',
+    lines: 10,
+    selhook: "FvwmCommand \\\"WindowId \\`echo %s | awk -F, '{print \\$NF}'\\` FuncFvwmSelectWindow\\\""
   },
 
   winlist: {
@@ -35,6 +35,12 @@ $conf = {
     fitler_dir: File.join(__dir__, 'etc')
   }
 }
+
+def dmenu text
+  cmd = "#{$conf[:dmenu][:exe]} -i -b -l #{$conf[:dmenu][:lines]} -fn #{Shellwords.escape($conf[:dmenu][:font])} -selhook \"#{$conf[:dmenu][:selhook]}\""
+  puts "POPEN: #{cmd}" if $conf[:verbose] > 0
+  IO.popen(cmd, 'w') { |ios| ios.puts text }
+end
 
 def usage opts = nil
   puts "Usage: #{File.basename $0} [options]"
@@ -73,7 +79,7 @@ begin
     when '--font'
       $conf[:dmenu][:font] = arg
     when '--lines'
-      $conf[:dmenu][:lines] = arg
+      $conf[:dmenu][:lines] = arg.to_i
     when '--filter-dir'
       $conf[:winlist][:filter_dir] = arg
     when '--no-iconofied'
@@ -93,7 +99,6 @@ rescue GetoptLong::Error
   exit 1
 end
 
-#winlist = WinList.new
-#
-#menu = Dmenu.new $conf[:dmenu]
-#menu.show (winlist.get $conf[:winlist])
+winlist = WinList.new $conf[:winlist]
+puts winlist.get.join "\n" if $conf[:verbose] > 0
+dmenu winlist.get.join "\n"
