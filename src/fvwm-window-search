@@ -116,5 +116,9 @@ rescue GetoptLong::Error
 end
 
 winlist = WinList.new $conf['winlist']
-puts winlist.get.join "\n" if $conf['verbose'] > 0
+if $conf['verbose'] > 0
+  puts "\nWinList:"
+  winlist.get.each_with_index {|e, idx| puts '%d. %s' % [idx, e.to_s.gsub(/\s+/, ' ')] }
+  puts
+end
 dmenu winlist.get.join "\n"

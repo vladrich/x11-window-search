@@ -134,8 +134,8 @@ class WinList
 
     begin
       @filter = WinListFilter.new @opt['filter_dir']
-    rescue Errno::ENOENT
-      $stderr.puts $! if @opt['verbose'] > 0
+    rescue Errno::ENOENT => ex
+      $stderr.puts ex if @opt['verbose'] > 0
       @filter = nil
     end
   end
