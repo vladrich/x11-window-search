@@ -25,7 +25,7 @@ index 1edb647..c6d081f 100644
 +/* -selhook option; run a command on every selection */
 +static const char *selection_hook = NULL;
 diff --git a/dmenu.c b/dmenu.c
-index 65f25ce..c4438b3 100644
+index 65f25ce..69254ee 100644
 --- a/dmenu.c
 +++ b/dmenu.c
 @@ -304,6 +304,62 @@ movewordedge(int dir)
@@ -91,7 +91,15 @@ index 65f25ce..c4438b3 100644
  static void
  keypress(XKeyEvent *ev)
  {
-@@ -572,6 +628,7 @@ run(void)
+@@ -464,6 +520,7 @@ insert:
+ 		break;
+ 	case XK_Return:
+ 	case XK_KP_Enter:
++		selhook(selection_hook, sel);
+ 		puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
+ 		if (!(ev->state & ControlMask)) {
+ 			cleanup();
+@@ -572,6 +629,7 @@ run(void)
  			break;
  		case KeyPress:
  			keypress(&ev.xkey);
@@ -99,7 +107,7 @@ index 65f25ce..c4438b3 100644
  			break;
  		case SelectionNotify:
  			if (ev.xselection.property == utf8)
-@@ -690,7 +747,8 @@ static void
+@@ -690,7 +748,8 @@ static void
  usage(void)
  {
  	fputs("usage: dmenu [-bfiv] [-l lines] [-p prompt] [-fn font] [-m monitor]\n"
@@ -109,7 +117,7 @@ index 65f25ce..c4438b3 100644
  	exit(1);
  }
  
-@@ -733,6 +791,8 @@ main(int argc, char *argv[])
+@@ -733,6 +792,8 @@ main(int argc, char *argv[])
  			colors[SchemeSel][ColFg] = argv[++i];
  		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
  			embed = argv[++i];
