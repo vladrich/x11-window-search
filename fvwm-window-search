@@ -35,8 +35,12 @@ def menu params, text
   cmd = [File.join(__dir__, "_out/dmenu/dmenu")]
   params = params.map do |k,v|
     k = "-"+k
-    !!v == v ? k : [k,v]
-  end.flatten.map(&:to_s)
+    if !!v == v
+      v ? k : nil
+    else
+      [k,v]
+    end
+  end.reject(&:nil?).flatten.map(&:to_s)
   IO.popen(cmd + params, 'w') { |ios| ios.puts text }
 end
 
