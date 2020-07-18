@@ -15,9 +15,11 @@ END
   s.files = [
     'focus.sh',
     'lib.rb',
-    'README.md',
+    'dmenu.patch',
+    'Makefile',
   ]
 
   s.bindir = '.'
   s.executables = ['fvwm-window-search']
+  s.extensions << 'extconf.rb'
 end

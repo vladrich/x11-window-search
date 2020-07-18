@@ -5,9 +5,8 @@ include FvwmWindowSearch
 require 'yaml'
 
 def options_load
-  gemspec = eval File.read File.join __dir__, 'pkg.gemspec'
   xdg_config_home = ENV['XDG_CONFIG_HOME'] || File.expand_path('~/.config')
-  conf = File.join xdg_config_home, gemspec.name, 'conf.yaml'
+  conf = File.join xdg_config_home, 'fvwm-window-search', 'conf.yaml'
   r = File.read conf rescue nil
   YAML.load r, conf rescue errx 1, "invalid config: #{$!}" if r
 end
@@ -45,6 +44,10 @@ def menu params, text
 end
 
 def main
+  ['xwininfo', 'xdotool'].each do |util|
+    errx 1, "no #{util} in PATH" unless which util
+  end
+
   opt = options
   winlist = windows_filter(opt["filter"], windows).map do |w|
     "#{w.name} | #{w.class} | #{w.id}"

@@ -99,4 +99,8 @@ module FvwmWindowSearch
     exit exit_code
   end
 
+  def which cmd
+    ENV['PATH'].split(File::PATH_SEPARATOR).map {|v| File.join v, cmd }
+      .find {|v| File.executable?(v) && !File.directory?(v) }
+  end
 end

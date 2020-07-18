@@ -11,3 +11,6 @@ $(out)/.dmenu.$(dmenu.commit):
 	git clone https://git.suckless.org/dmenu $(dmenu)
 	git -C $(dmenu) checkout $(dmenu.commit) -q
 	touch $@
+
+# an empty target to satisfy rubygems
+install:
