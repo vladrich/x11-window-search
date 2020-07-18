@@ -1,0 +1,120 @@
+diff --git a/Makefile b/Makefile
+index a03a95c..ee5cffb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -17,8 +17,8 @@ options:
+ .c.o:
+ 	$(CC) -c $(CFLAGS) $<
+ 
+-config.h:
+-	cp config.def.h $@
++config.h: config.def.h
++	cp $< $@
+ 
+ $(OBJ): arg.h config.h config.mk drw.h
+ 
+diff --git a/config.def.h b/config.def.h
+index 1edb647..c6d081f 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -21,3 +21,6 @@ static unsigned int lines      = 0;
+  * for example: " /?\"&[]"
+  */
+ static const char worddelimiters[] = " ";
++
++/* -selhook option; run a command on every selection */
++static const char *selection_hook = NULL;
+diff --git a/dmenu.c b/dmenu.c
+index 65f25ce..c4438b3 100644
+--- a/dmenu.c
++++ b/dmenu.c
+@@ -304,6 +304,62 @@ movewordedge(int dir)
+ 	}
+ }
+ 
++/*
++ * Replacing all instances of ' with '\'' then enclosing the whole
++ * string in single quotes (') is the safe way.
++ * */
++static char *
++shellquote(const char *src)
++{
++  char *quoted, *q;
++  const char *p;
++
++  if (!src) return NULL;
++  p = src;
++
++  if (!(quoted = malloc(strlen(src)*4+3))) die("malloc failed");
++  q = quoted;
++
++  *q++ = '\'';
++  while (*p) {
++    if (*p == '\'') {
++      *q++ = '\'';
++      *q++ = '\\';
++      *q++ = '\'';
++      *q++ = '\'';
++    } else {
++      *q++ = *p;
++    }
++
++    p++;
++  }
++  *q++ = '\'';
++  *q = '\0';
++
++  return quoted;
++}
++
++void
++selhook(const char *user_command, const struct item *item)
++{
++  char *cmd, *quoted_item_text;
++  size_t cmd_size;
++
++  if ( !(user_command && item)) return;
++  quoted_item_text = shellquote(item->text);
++  /* printf("QUOTED: >%s<\n", quoted_item_text); */
++
++  cmd_size = strlen(user_command) + strlen(quoted_item_text) + 1;
++  if ( !(cmd = malloc(cmd_size))) die("malloc failed");
++  snprintf(cmd, cmd_size, user_command, quoted_item_text);
++
++  /* printf("SELECTED HOOK: %s\n", cmd); */
++  system(cmd);
++
++  free(quoted_item_text);
++  free(cmd);
++}
++
+ static void
+ keypress(XKeyEvent *ev)
+ {
+@@ -572,6 +628,7 @@ run(void)
+ 			break;
+ 		case KeyPress:
+ 			keypress(&ev.xkey);
++			selhook(selection_hook, sel);
+ 			break;
+ 		case SelectionNotify:
+ 			if (ev.xselection.property == utf8)
+@@ -690,7 +747,8 @@ static void
+ usage(void)
+ {
+ 	fputs("usage: dmenu [-bfiv] [-l lines] [-p prompt] [-fn font] [-m monitor]\n"
+-	      "             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]\n", stderr);
++	      "             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]\n"
++	      "             [-selhook cmd]\n", stderr);
+ 	exit(1);
+ }
+ 
+@@ -733,6 +791,8 @@ main(int argc, char *argv[])
+ 			colors[SchemeSel][ColFg] = argv[++i];
+ 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
+ 			embed = argv[++i];
++		else if(!strcmp(argv[i], "-selhook"))  /* a command to run */
++			selection_hook = argv[++i];
+ 		else
+ 			usage();
+ 
