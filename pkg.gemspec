@@ -17,6 +17,7 @@ END
     'lib.rb',
     'dmenu.patch',
     'Makefile',
+    'README.md',
   ]
 
   s.bindir = '.'
