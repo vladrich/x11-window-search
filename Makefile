@@ -1,39 +1,16 @@
-DEST ?= $(FVWM_USERDIR)/fvwm-window-search
+out := _out
+dmenu := $(out)/dmenu
+dmenu.commit := 9b38fda6feda68f95754d5b8932b1a69471df960
 
-.PHONY: help
-help:
-	@echo "make compile    # clone & compile dmenu"
-	@echo "make clean      # rm dmenu repo"
-	@echo
-	@echo "make install    # install program to $(DEST)"
-	@echo "make uninstall  # rm $(DEST) (be careful!)"
-	@echo
-	@echo "See README.md for details."
+$(out)/.dmenu.build: $(out)/.dmenu.$(dmenu.commit) dmenu.patch
+	patch -d $(dmenu) -p1 < dmenu.patch
+	make -C $(dmenu)
+	touch $@
 
-.PHONY: check
-check:
-	@if [ "$$FVWM_USERDIR" = "" ] ; then \
-		echo "no FVWM userdir found; run 'make install DEST=/some/dir'" 1>&2; \
-		exit 1; \
-	fi;
+$(out)/.dmenu.$(dmenu.commit):
+	git clone https://git.suckless.org/dmenu $(dmenu)
+	git -C $(dmenu) checkout $(dmenu.commit) -q
+	touch $@
 
-.PHONY: install
-install: compile check
-	mkdir -p "$(DEST)"
-	cp dmenu/dmenu/dmenu "$(DEST)"
-	cp src/fvwm-* "$(DEST)"
-	cp -R src/lib "$(DEST)"
-	cp -R etc "$(DEST)"
-
-.PHONY: uninstall
-uninstall: check
-	rm -rf "$(DEST)"
-	@echo Enjoy!
-
-.PHONY: compile
-compile:
-	$(MAKE) -C dmenu
-
-.PHONY: clean
-clean:
-	$(MAKE) -C dmenu clean
+# an empty target to satisfy rubygems
+install:
