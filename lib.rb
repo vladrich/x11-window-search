@@ -69,7 +69,6 @@ module FvwmWindowSearch
     .select(&:useful?)
   end
 
-  # TODO: check patterns
   def windows_filter patterns, winlist
     desired = -> (type, value) {
       include = patterns[type].filter{|v| v[0] != '!'}

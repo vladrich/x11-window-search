@@ -49,7 +49,12 @@ def main
   end
 
   opt = options
-  winlist = windows_filter(opt["filter"], windows).map do |w|
+  begin
+    winlist = windows_filter opt["filter"], windows
+  rescue RegexpError
+    errx 1, "filter: #{$!}"
+  end
+  winlist = winlist.map do |w|
     "#{w.name} | #{w.class} | #{w.id}"
   end.join "\n"
 
