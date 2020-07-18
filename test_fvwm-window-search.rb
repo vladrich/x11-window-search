@@ -39,3 +39,47 @@ class Windows < Minitest::Test
   end
 
 end
+
+class WindowList < Minitest::Test
+  def setup
+    @winlist = [
+      '0x1400005 "FvwmIconMan": ("FvwmIconMan" "FvwmIconMan")  1381x21+0+0  +214+5',
+      '0x4400002 "FvwmIdent": ("FvwmIdent" "FvwmIdent")  474x469+0+0  +1121+182',
+      '0x2e0000f "mutt": ("mutt" "XTerm")  644x692+0+0  +883+-844',
+    ].map {|v| Window.new v}
+  end
+
+  def test_class
+    patterns = {
+      "name" => [],
+      "resource" => [],
+      "class" => ['^Fvwm', '!^FvwmIdent$']
+    }
+    wl = windows_filter patterns, @winlist
+    assert_equal 2, wl.size
+    assert_equal 'FvwmIdent', wl[0].name
+    assert_equal 'mutt', wl[1].name
+  end
+
+  def test_class_and_name
+    patterns = {
+      "name" => ['mutt'],
+      "resource" => [],
+      "class" => ['^Fvwm', '!^FvwmIdent$']
+    }
+    wl = windows_filter patterns, @winlist
+    assert_equal 1, wl.size
+    assert_equal 'FvwmIdent', wl[0].name
+  end
+
+  def test_empty_patterns
+    patterns = {
+      "name" => [],
+      "resource" => [],
+      "class" => []
+    }
+    wl = windows_filter patterns, @winlist
+    assert_equal 3, wl.size
+  end
+
+end
