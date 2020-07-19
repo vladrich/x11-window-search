@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.version = '1.0.0'
+  s.version = '1.1.0'
 
   s.name = 'fvwm-window-search'
   s.summary = "Interactive incremental windows search & selection for X Window"
