@@ -12,7 +12,7 @@ Incremental window search & immediate switch to the selected window
 
 ## Reqs
 
-* Ruby (tested w/ 2.7.0)
+* Ruby
 * `xwininfo` & `xdotool` (`xorg-x11-utils` & `xdotool` Fedora pkgs)
 
 ## Compilation
@@ -32,18 +32,26 @@ To customise dmenu or filtering, create a yaml file
 dmenu:
   fn: Monospace-12
   b: false
+  selhook-return-key-focus-only: true
 filter:
     name: ['System Monitor']
+    resource: []
+    class: []
 ~~~
 
-This passes to dmenu `-fn` & `-b` CLOs & instructs to filter out any
-window that matches `System Monitor` regexp in its title.
+Subkeys in `dmenu` are the usual CLOs for
+[dmenu(1)][]. `selhook-return-key-focus-only` is a custom one, that
+enables window focusing on pressing Return only.
 
-See the defaults in `fvwm-window-search` file.
+[dmenu(1)]: https://manpages.debian.org/unstable/suckless-tools/dmenu.1.en.html
+
+`filter` key tells what windows should be filtered out. Each value in
+a subkey is an array of regexes. See the defaults in
+`fvwm-window-search` file.
 
 ## Bugs
 
-* Tested only w/ Fvwm3.
+* Tested only w/ Ruby-2.7.0 & Fvwm3.
 * No distinction between normal & iconified windows.
 
 ## License
