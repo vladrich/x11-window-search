@@ -7,12 +7,12 @@ Incremental window search & immediate switch to the selected window
 
 ![demo](https://thumbs.gfycat.com/GenerousRingedFlicker-small.gif)
 
-* Should work w/ any X11 window manager.
-* Filtering by windows names/resources/classes.
+* Should work w/ most stackings X11 window managers.
+* Filtering by window name/resource/classe.
 
 ## Reqs
 
-* Ruby
+* Ruby 2.4+
 * `xwininfo` & `xdotool` (`xorg-x11-utils` & `xdotool` Fedora pkgs)
 
 ## Compilation
@@ -51,7 +51,7 @@ a subkey is an array of regexes. See the defaults in
 
 ## Bugs
 
-* Tested only w/ Ruby-2.7.0 & Fvwm3.
+* Tested only w/ Fvwm3.
 * No distinction between normal & iconified windows.
 
 ## License

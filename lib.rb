@@ -71,8 +71,8 @@ module FvwmWindowSearch
 
   def windows_filter patterns, winlist
     desired = -> (type, value) {
-      include = patterns[type].filter{|v| v[0] != '!'}
-      exclude = patterns[type].filter{|v| v[0] == '!'}.map {|v| v[1..-1]}
+      include = patterns[type].select {|v| v[0] != '!'}
+      exclude = patterns[type].select {|v| v[0] == '!'}.map {|v| v[1..-1]}
 
       exclude.each do |pattern|
         return true if value.match pattern
@@ -83,9 +83,9 @@ module FvwmWindowSearch
       true
     }
 
-    winlist.filter { |w| desired.call "class", w.class }
-      .filter{ |w| desired.call "resource", w.resource }
-      .filter{ |w| desired.call "name", w.name }
+    winlist.select { |w| desired.call "class", w.class }
+      .select { |w| desired.call "resource", w.resource }
+      .select { |w| desired.call "name", w.name }
   end
 
   def deep_merge first, second
