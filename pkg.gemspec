@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.version = '1.1.0'
+  s.version = '1.2.0'
   s.required_ruby_version = '>= 2.4.0'
 
   s.name = 'fvwm-window-search'
