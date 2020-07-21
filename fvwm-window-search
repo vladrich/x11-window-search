@@ -3,18 +3,13 @@
 require_relative './lib'
 include FvwmWindowSearch
 require 'yaml'
-
-def options_load
-  xdg_config_home = ENV['XDG_CONFIG_HOME'] || File.expand_path('~/.config')
-  conf = File.join xdg_config_home, 'fvwm-window-search', 'conf.yaml'
-  r = File.read conf rescue nil
-  YAML.load r, conf rescue errx 1, "invalid config: #{$!}" if r
-end
+require 'optparse'
 
 def options
   default = {
     "dmenu" => {               # each key is a corresponding CL option
       "selhook" => File.join(__dir__, "focus.sh %s"),
+      "selhook-return-key-focus-only" => false,
       "fn" => "Monospace-10",
       "l" => 8,
       "b" => true,
@@ -27,7 +22,29 @@ def options
     }
   }
 
-  deep_merge(default, options_load || {})
+  cl = options_load_cl
+  env = deep_merge(default, options_load_file(cl) || {})
+  deep_merge env, cl
+end
+
+def options_load_cl
+  opt = { "dmenu" => {} }
+  OptionParser.new do |o|
+    o.on("-c path", "an alternative path to conf.yaml") { |v| opt["conf"] = v }
+    o.on("-r", "focus a window only if Return is pressed") do
+      opt["dmenu"]["selhook-return-key-focus-only"] = true
+    end
+  end.parse!
+  opt
+end
+
+def options_load_file opt       # return nil if config wasn't found
+  conf = opt["conf"] || -> do
+    xdg_config_home = ENV['XDG_CONFIG_HOME'] || File.expand_path('~/.config')
+    File.join xdg_config_home, 'fvwm-window-search', 'conf.yaml'
+  end.call
+  r = File.read conf rescue nil
+  YAML.load r, conf rescue errx 1, "invalid config: #{$!}" if r
 end
 
 def menu params, text

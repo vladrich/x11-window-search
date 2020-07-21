@@ -22,7 +22,12 @@ not contravene w/ a system-installed dmenu.
 
 ## Usage
 
-Run `fvwm-window-search`.
+~~~
+$ ./fvwm-window-search -h
+Usage: fvwm-window-search [options]
+    -c path                          an alternative path to conf.yaml
+    -r                               focus a window only if Return is pressed
+~~~
 
 To customise dmenu or filtering, create a yaml file
 `$XDG_CONFIG_HOME/fvwm-window-search/conf.yaml`, e.g.:
@@ -40,8 +45,8 @@ filter:
 ~~~
 
 Subkeys in `dmenu` are the usual CLOs for
-[dmenu(1)][]. `selhook-return-key-focus-only` is a custom one, that
-enables window focusing on pressing Return only.
+[dmenu(1)][]. `selhook-return-key-focus-only` is an equivalent of `-r`
+CLO.
 
 [dmenu(1)]: https://manpages.debian.org/unstable/suckless-tools/dmenu.1.en.html
 
