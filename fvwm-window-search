@@ -61,7 +61,7 @@ def menu params, text
 end
 
 def main
-  ['wmctrl', 'xdotool'].each do |util|
+  ['wmctrl'].each do |util|
     errx 1, "no #{util} in PATH" unless which util
   end
 

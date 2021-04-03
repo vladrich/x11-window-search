@@ -13,7 +13,7 @@ Incremental window search & immediate switch to the selected window
 ## Reqs
 
 * Ruby 2.4+
-* `xwininfo` & `xdotool` (`xorg-x11-utils` & `xdotool` Fedora pkgs)
+* `wmctrl`
 
 ## Compilation
 

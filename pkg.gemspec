@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.version = '1.2.0'
+  s.version = '2.0.0'
   s.required_ruby_version = '>= 2.4.0'
 
   s.name = 'fvwm-window-search'
@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
 A window switcher: search for windows interactively using a patched
 dmenu utility (comes with the gem). This was originally made for Fvwm,
 but it's been fully rewritten to work out-of-the-box with any stacking
-window manager. Requires xdotool & xwininfo installed.
+window manager. Requires wmctrl installed.
 
 It differs from rofi & co in that it activates (brings up) windows
 _during_ the search.
