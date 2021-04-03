@@ -1,72 +1,26 @@
 module FvwmWindowSearch; end
 
 class FvwmWindowSearch::Window
-  def initialize xwininfo_line
-    @line = xwininfo_line.match(/^([x0-9a-f]+)\s+(["\(].+["\)]):\s+\((.*)\)\s+([x0-9+-]+)\s+([0-9+-]+)$/)
-    raise "invalid xwininfo line" unless @line
-    @dim = parse
+  def initialize wmctrl_line
+    @data = wmctrl_line.match(/^([x0-9a-f]+)\s+(-?\d+)\s+([^\s]+)\s+([^\s]+)\s+(.+)/)
+    raise "invalid wmctrl line" unless @data
   end
 
-  def parse
-    dim = {}
-    if @line[4]
-      m4 = @line[4].match(/^([0-9]+)x([0-9]+)\+([0-9-]+)\+([0-9-]+)$/)
-      if m4
-        dim[:w] = m4[1].to_i
-        dim[:h] = m4[2].to_i
-        dim[:x_rel] = m4[3].to_i
-        dim[:y_rel] = m4[4].to_i
-      end
-    end
-
-    if @line[5]
-      m5 = @line[5].match(/^\+([0-9-]+)\+([0-9-]+)$/)
-      if m5
-        dim[:x] = m5[1].to_i
-        dim[:y] = m5[2].to_i
-      end
-    end
-
-    dim
-  end
-
-  def id; @line[1]; end
-
-  def name;
-    return unless @line[2]
-    @line[2] == '(has no name)' ? nil : @line[2][1..-2]
-  end
-
-  def resource; @line[3]&.split(' ')&.dig(0)&.slice(1..-2); end
-  def class;    @line[3]&.split(' ')&.dig(1)&.slice(1..-2); end
-  def width; @dim[:w]; end
-  def height; @dim[:h]; end
-  def x; @dim[:x]; end # an absolute upper-left X
-  def y; @dim[:y]; end # an absolute upper-left Y
-  def x_rel; @dim[:x_rel]; end
-  def y_rel; @dim[:y_rel]; end
-
-  def useful?
-    return false unless @line
-    return false if width == 0 || height == 0
-    return false if (x == x_rel) && (y == y_rel)
-    return false if x_rel > 0 || y_rel > 0
-    return false unless self.class
-    true
-  end
+  def id; @data[1]; end
+  def desk; @data[2].to_i < 0 ? nil : @data[2]; end
+  def resource; @data[3].split('.')[0]; end
+  def class; @data[3].split('.')[1]; end
+  def host; @data[4]; end
+  def name; @data[5]; end
 
   def inspect
-    "#<Window> id=#{id}, name=#{name}, resource=#{resource}, class=#{self.class}"
+    "#<Window> id=#{id},desk=#{desk},resource=#{resource},class=#{self.class},host=#{host},name=#{name}"
   end
 end
 
 module FvwmWindowSearch
   def windows
-  `xwininfo -root -tree`.split("\n")
-    .select {|v| v.match(/^\s*0x.+/)}
-    .map(&:strip)
-    .map {|v| Window.new(v)}
-    .select(&:useful?)
+    `wmctrl -lx`.split("\n").map {|v| Window.new(v)}
   end
 
   def windows_filter patterns, winlist
