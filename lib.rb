@@ -33,7 +33,7 @@ module FvwmWindowSearch
     `wmctrl -lx`.split("\n").map {|v| Window.new(v)}
   end
 
-  def windows_filter patterns, winlist
+  def windows_filter_out patterns, winlist
     desired = -> (type, value) {
       include = patterns[type].select {|v| v[0] != '!'}
       exclude = patterns[type].select {|v| v[0] == '!'}.map {|v| v[1..-1]}

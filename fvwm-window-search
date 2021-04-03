@@ -15,7 +15,7 @@ def options
       "b" => true,
       "i" => true,
     },
-    "filter" => {
+    "filter-out" => {
       "name" => [],
       "resource" => [],
       "class" => ['^Fvwm', '!^FvwmIdent$']
@@ -67,9 +67,9 @@ def main
 
   opt = options
   begin
-    winlist = windows_filter opt["filter"], windows
+    winlist = windows_filter_out opt["filter-out"], windows
   rescue RegexpError
-    errx 1, "filter: #{$!}"
+    errx 1, "filter-out: #{$!}"
   end
   winlist = winlist.map do |w|
     "#{w.desk} | #{w.name} | #{w.class} | #{w.host} | #{w.id}"

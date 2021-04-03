@@ -46,7 +46,7 @@ class WindowList < Minitest::Test
       "resource" => [],
       "class" => ['^Fvwm', '!^FvwmPager$']
     }
-    wl = windows_filter patterns, @winlist
+    wl = windows_filter_out patterns, @winlist
     assert_equal 2, wl.size
     assert_equal 'Desk 1', wl[0].name
     assert_equal 'mutt', wl[1].name
@@ -58,7 +58,7 @@ class WindowList < Minitest::Test
       "resource" => [],
       "class" => ['^Fvwm', '!^FvwmPager$']
     }
-    wl = windows_filter patterns, @winlist
+    wl = windows_filter_out patterns, @winlist
     assert_equal 1, wl.size
     assert_equal 'Desk 1', wl[0].name
   end
@@ -69,7 +69,7 @@ class WindowList < Minitest::Test
       "resource" => [],
       "class" => []
     }
-    wl = windows_filter patterns, @winlist
+    wl = windows_filter_out patterns, @winlist
     assert_equal 3, wl.size
   end
 

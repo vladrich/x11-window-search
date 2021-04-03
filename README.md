@@ -38,7 +38,7 @@ dmenu:
   fn: Monospace-12
   b: false
   selhook-return-key-focus-only: true
-filter:
+filter-out:
     name: ['System Monitor']
     resource: []
     class: []
@@ -50,8 +50,8 @@ CLO.
 
 [dmenu(1)]: https://manpages.debian.org/unstable/suckless-tools/dmenu.1.en.html
 
-`filter` key tells what windows should be filtered out. Each value in
-a subkey is an array of regexes. See the defaults in
+`filter-out` key tells what windows should be filtered out. Each value
+in a subkey is an array of regexes. See the defaults in
 `fvwm-window-search` file.
 
 ## Bugs
