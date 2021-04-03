@@ -72,7 +72,7 @@ def main
     errx 1, "filter: #{$!}"
   end
   winlist = winlist.map do |w|
-    "#{w.name} | #{w.class} | #{w.id}"
+    "#{w.desk} | #{w.name} | #{w.class} | #{w.host} | #{w.id}"
   end.join "\n"
 
   menu opt["dmenu"], winlist

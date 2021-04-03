@@ -24,6 +24,11 @@ class Windows < Minitest::Test
     assert_nil w.desk
   end
 
+  def test_dots_in_resouce
+    w = Window.new '0x010000b1  0 gimp-2.10.Gimp-2.10   hm76 GNU Image Manipulation Program'
+    assert_equal 'gimp-2.10', w.resource
+    assert_equal 'Gimp-2.10', w.class
+  end
 end
 
 class WindowList < Minitest::Test

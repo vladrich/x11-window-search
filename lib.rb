@@ -8,10 +8,20 @@ class FvwmWindowSearch::Window
 
   def id; @data[1]; end
   def desk; @data[2].to_i < 0 ? nil : @data[2]; end
-  def resource; @data[3].split('.')[0]; end
-  def class; @data[3].split('.')[1]; end
   def host; @data[4]; end
   def name; @data[5]; end
+
+  def resource_and_class
+    str = @data[3]
+    r = str.split('.')
+    return r if r.size <= 2
+
+    idx = str.index(/[[:upper:]]/)
+    return idx ? [ str[0...idx-1], str[idx..-1] ] : r
+  end
+
+  def resource; resource_and_class[0]; end
+  def class; resource_and_class[1]; end
 
   def inspect
     "#<Window> id=#{id},desk=#{desk},resource=#{resource},class=#{self.class},host=#{host},name=#{name}"
