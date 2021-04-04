@@ -1,6 +1,6 @@
 out := _out
 dmenu := $(out)/dmenu
-dmenu.commit := 9b38fda6feda68f95754d5b8932b1a69471df960
+dmenu.commit := 1a13d0465d1a6f4f74bc5b07b04c9bd542f20ba6
 
 all: $(out)/.dmenu.build $(out)/focus $(out)/winlist
 
