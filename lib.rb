@@ -1,7 +1,10 @@
 require "json"
 
 module FvwmWindowSearch
-  def windows; JSON.parse `_out/winlist`; end
+  def windows
+    cmd = File.join(__dir__, '_out/winlist')
+    JSON.parse `#{cmd}`
+  end
 
   def windows_filter_out patterns, winlist
     desired = -> (type, value) {

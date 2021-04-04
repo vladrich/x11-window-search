@@ -5,4 +5,8 @@ id=`echo "$1" | awk -F'|' '{print $NF} END { exit $NF == "" ? 1 : 0}'` || {
     exit 1
 }
 
-_out/focus $id
+__filename=`readlink -f "$0"`
+__dirname=`dirname "${__filename}"`
+
+# shellcheck disable=2086
+${__dirname}/_out/focus $id
