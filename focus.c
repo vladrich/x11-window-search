@@ -46,8 +46,7 @@ bool window_activate(Display *dpy, Window id) {
   if (-1 != desk) {
     client_msg(dpy, DefaultRootWindow(dpy), "_NET_CURRENT_DESKTOP",
                desk, 0, 0, 0, 0);
-  } else
-    warnx("cannot switch desktop");
+  }
 
   bool r = client_msg(dpy, id, "_NET_ACTIVE_WINDOW", 0, 0, 0, 0, 0);
   XMapRaised(dpy, id);
@@ -73,6 +72,7 @@ int main(int argc, char **argv) {
   ulong id = str2id(argv[1]);
   if (!id) errx(1, "invalid window id: `%s`", argv[1]);
 
+  XSynchronize(dpy, True); // snake oil?
   bool r = window_activate(dpy, id);
   if (!r) return 1;
   r = window_center_mouse(dpy, id);
