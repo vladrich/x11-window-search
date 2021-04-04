@@ -14,8 +14,9 @@ $(out)/.dmenu.$(dmenu.commit):
 	git -C $(dmenu) checkout $(dmenu.commit) -q
 	touch $@
 
-LDFLAGS := $(shell pkg-config --libs x11)
-CFLAGS := -g -Wall $(shell pkg-config --cflags x11)
+libs := x11 jansson
+LDFLAGS := $(shell pkg-config --libs $(libs))
+CFLAGS := -g -Wall $(shell pkg-config --cflags $(libs))
 $(out)/%: %.c lib.c
 	$(LINK.c) $< $(LOADLIBES) $(LDLIBS) -o $@
 

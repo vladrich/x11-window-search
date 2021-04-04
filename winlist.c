@@ -7,6 +7,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#include <jansson.h>
 
 #include "lib.c"
 
@@ -91,6 +92,7 @@ int main() {
   Display *dpy = XOpenDisplay(getenv("DISPLAY"));
   if (!dpy) errx(1, "failed to open display %s", getenv("DISPLAY"));
 
+  json_t *r = json_array();
   WinList list = winlist(dpy);
   for (ulong idx = 0; idx < list.size; idx++) {
     ulong wid = list.ids[idx];
@@ -99,16 +101,24 @@ int main() {
     char *name = wm_name(dpy, wid);
     ResClass rc = wm_class(dpy, wid);
 
-    long desk = desktop(dpy, wid);
-    desk < 0 ? printf("*") : printf("%ld", desk);
-
-    printf(" | %s | %s | %s | 0x%lx\n", host, rc.class_name, name, wid);
+    json_t *line = json_object();
+    json_object_set_new(line, "desk", json_integer(desktop(dpy, wid)));
+    json_object_set_new(line, "host", json_string(host));
+    json_object_set_new(line, "name", json_string(name));
+    json_object_set_new(line, "resource", json_string(rc.resource));
+    json_object_set_new(line, "class", json_string(rc.class_name));
+    json_object_set_new(line, "id", json_integer(wid));
+    json_array_append_new(r, line);
 
     free(host);
     free(name);
     free(rc.resource);
     free(rc.class_name);
   }
-
   XFree(list.ids);
+
+  char *dump = json_dumps(r, JSON_COMPACT);
+  printf("%s\n", dump);
+  free(dump);
+  json_decref(r);
 }

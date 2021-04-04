@@ -61,10 +61,6 @@ def menu params, text
 end
 
 def main
-  ['wmctrl'].each do |util|
-    errx 1, "no #{util} in PATH" unless which util
-  end
-
   opt = options
   begin
     winlist = windows_filter_out opt["filter-out"], windows
@@ -72,7 +68,8 @@ def main
     errx 1, "filter-out: #{$!}"
   end
   winlist = winlist.map do |w|
-    "#{w.desk} | #{w.name} | #{w.class} | #{w.host} | #{w.id}"
+    desk = w['desk'] == -1 ? '*' : w['desk']
+    [desk, w['class'], w['name'], w['host'], '0x'+w['id'].to_s(16)].join ' | '
   end.join "\n"
 
   menu opt["dmenu"], winlist

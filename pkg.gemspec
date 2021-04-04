@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
 A window switcher: search for windows interactively using a patched
 dmenu utility (comes with the gem). This was originally made for Fvwm,
 but it's been fully rewritten to work out-of-the-box with any stacking
-window manager. Requires wmctrl installed.
+window manager. Requires jansson-devel C library installed.
 
 It differs from rofi & co in that it activates (brings up) windows
 _during_ the search.
@@ -20,6 +20,9 @@ END
   s.files = [
     'focus.sh',
     'lib.rb',
+    'lib.c',
+    'focus.c',
+    'winlist.c',
     'dmenu.patch',
     'Makefile',
     'README.md',

@@ -8,12 +8,12 @@ Incremental window search & immediate switch to the selected window
 ![demo](https://thumbs.gfycat.com/GenerousRingedFlicker-small.gif)
 
 * Should work w/ most stackings X11 window managers.
-* Filtering by window name/resource/classe.
+* Filtering by window name/resource/class.
 
 ## Reqs
 
 * Ruby 2.4+
-* `wmctrl`
+* `dnf install jansson-devel`
 
 ## Compilation
 
