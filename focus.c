@@ -6,28 +6,14 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
+#include "lib.c"
+
 ulong str2id(const char *s) {
     ulong id;
     if (sscanf(s, "0x%lx", &id) != 1 &&
         sscanf(s, "0X%lx", &id) != 1 &&
         sscanf(s, "%lu", &id) != 1) return 0;
     return id;
-}
-
-ulong prop_desktop(Display *dpy, ulong id) {
-  Atom type;
-  int format;
-  ulong nitems, bytes_after;
-  u_char *prop;
-
-  Atom atom = XInternAtom(dpy, "_NET_WM_DESKTOP", False);
-  int r = XGetWindowProperty(dpy, id, atom, 0L, sizeof(Atom), False,
-                             XA_CARDINAL, &type, &format,
-                             &nitems, &bytes_after, &prop);
-  if ( !(r == Success && prop)) return -1;
-  ulong val = ((ulong*)prop)[0];
-  XFree(prop);
-  return val;
 }
 
 bool client_msg(Display *dpy, Window id, char *msg,
@@ -56,10 +42,10 @@ bool client_msg(Display *dpy, Window id, char *msg,
 }
 
 bool window_activate(Display *dpy, Window id) {
-  ulong desktop = prop_desktop(dpy, id);
-  if (-1 != desktop) {
+  long desk = desktop(dpy, id);
+  if (-1 != desk) {
     client_msg(dpy, DefaultRootWindow(dpy), "_NET_CURRENT_DESKTOP",
-               desktop, 0, 0, 0, 0);
+               desk, 0, 0, 0, 0);
   } else
     warnx("cannot switch desktop");
 
@@ -76,6 +62,8 @@ bool window_center_mouse(Display *dpy, ulong id) {
   XFlush(dpy);
   return true;
 }
+
+
 
 int main(int argc, char **argv) {
   Display *dpy = XOpenDisplay(getenv("DISPLAY"));
