@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
-  s.version = '2.0.0'
-  s.required_ruby_version = '>= 2.4.0'
+  s.version = '2.1.0'
+  s.required_ruby_version = '>= 2.1.0'
 
   s.name = 'fvwm-window-search'
   s.summary = "A window switcher: an interactive incremental windows search & selection for X Window"
@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
 A window switcher: search for windows interactively using a patched
 dmenu utility (comes with the gem). This was originally made for Fvwm,
 but it's been fully rewritten to work out-of-the-box with any stacking
-window manager. Requires jansson-devel C library installed.
+window manager. Requires a preinstalled jansson-devel C library.
 
 It differs from rofi & co in that it activates (brings up) windows
 _during_ the search.
@@ -19,7 +19,6 @@ END
   s.license = 'MIT'
   s.files = [
     'focus.sh',
-    'lib.rb',
     'lib.c',
     'focus.c',
     'winlist.c',

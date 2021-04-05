@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env -S ruby --disable-gems
 
 require 'yaml'
 require 'json'
@@ -29,7 +29,6 @@ end
 def options_command_line
   opt = { "dmenu" => {} }
   OptionParser.new do |o|
-    o.version = (eval File.read File.join __dir__, 'pkg.gemspec').version
     o.on("-c path", "an alternative path to conf.yaml") { |v| opt["conf"] = v }
     o.on("-r", "switch to a window only when <Return> is pressed") do
       opt["dmenu"]["selhook-return-key-focus-only"] = true
@@ -44,7 +43,7 @@ def options_config_file opt
     File.join xdg_config_home, 'fvwm-window-search', 'conf.yaml'
   end.call
   r = File.read file rescue nil
-  YAML.load r, file rescue abort "invalid config: #{$!}" if r
+  YAML.safe_load(r, filename: file) rescue abort "invalid config: #{$!}" if r
 end
 
 def deep_merge first, second
@@ -84,6 +83,7 @@ end
 
 def main
   opt = options
+  pp opt if $DEBUG
   dmenu = IO.popen(dmenu_cmd(opt['dmenu']), 'r+')
 
   IO.popen(File.join(__dir__, '_out/winlist')).each_line do |line|
@@ -103,4 +103,5 @@ def main
   dmenu.close
 end
 
-main if __FILE__== $0
+# not __FILE__ == $0, for $0 points to a generated stub after `gem install ...`
+main unless defined? Minitest

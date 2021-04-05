@@ -1,5 +1,5 @@
-load './fvwm-window-search'
 require 'minitest/autorun'
+load 'fvwm-window-search'
 
 class Window < Minitest::Test
   def setup

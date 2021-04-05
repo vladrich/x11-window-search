@@ -12,21 +12,21 @@ Incremental window search & immediate switch to the selected window
 
 ## Reqs
 
-* Ruby 2.4+
+* Ruby 2.1+
 * `dnf install jansson-devel`
 
 ## Compilation
 
-Type `make`. This clones the dmenu repo, patches & builds it. It does
-not contravene w/ a system-installed dmenu.
+Type `make`. This clones the dmenu repo, patches & builds it. It
+doesn't interfere w/ a system-installed dmenu.
 
 ## Usage
 
 ~~~
 $ ./fvwm-window-search -h
 Usage: fvwm-window-search [options]
-    -c path                          an alternative path to conf.yaml
-    -r                               focus a window only if Return is pressed
+    -c path                      an alternative path to conf.yaml
+    -r                           switch to a window only when <Return> is pressed
 ~~~
 
 To customise dmenu or filtering, create a yaml file
@@ -50,9 +50,19 @@ CLO.
 
 [dmenu(1)]: https://manpages.debian.org/unstable/suckless-tools/dmenu.1.en.html
 
-`filter-out` key tells what windows should be filtered out. Each value
-in a subkey is an array of regexes. See the defaults in
+`filter-out` key tells what windows should be ignored. Each value in a
+subkey is an array of regexes. See the defaults at the top of
 `fvwm-window-search` file.
+
+## Start-up time
+
+As a task switcher, the program must not only run fast, but also
+*start* fast. I managed to get it under 70ms on my laptop, when you
+run `./fvwm-window-search` directly from the repo.
+
+This is not the case with rubygems! The latter generates a stub script
+that invokes `./fvwm-window-search` file. This indirection may add
+~140ms of additional delay.
 
 ## Bugs
 
