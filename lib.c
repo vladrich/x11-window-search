@@ -17,7 +17,7 @@ long desktop(Display *dpy, Window wid) {
   if (!prop(dpy, wid, XA_CARDINAL, "_NET_WM_DESKTOP", &prop_val, &prop_size))
     return -2;
 
-  long r = -1;
+  long r = -1; // means a window is in a 'sticky' mode
   if (prop_val) r = ((long*)prop_val)[0];
   free(prop_val);
   return r;

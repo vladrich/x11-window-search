@@ -1,3 +1,10 @@
+/*
+  produces line-delimited JSON of currently managed windows by an X
+  window manager:
+
+  {"desk":0,"host":"hm76","name":"xterm","resource":"xterm","class":"XTerm","id":67108878}
+*/
+
 #include <stdlib.h>
 #include <err.h>
 #include <stdio.h>
@@ -16,7 +23,7 @@ typedef struct {
   ulong size;
 } WinList;
 
-// result should be freed
+// result (WinList.ids) should be freed
 WinList winlist(Display *dpy) {
   WinList list;
   u_char *result;
@@ -50,7 +57,7 @@ typedef struct {
   char *class_name;
 } ResClass;
 
-// result should be freed
+// result (ResClass.*) should be freed
 ResClass wm_class(Display *dpy, Window wid) {
   ResClass r = {.resource = NULL};
 
@@ -92,7 +99,6 @@ int main() {
   Display *dpy = XOpenDisplay(getenv("DISPLAY"));
   if (!dpy) errx(1, "failed to open display %s", getenv("DISPLAY"));
 
-  json_t *r = json_array();
   WinList list = winlist(dpy);
   for (ulong idx = 0; idx < list.size; idx++) {
     ulong wid = list.ids[idx];
@@ -108,7 +114,11 @@ int main() {
     json_object_set_new(line, "resource", json_string(rc.resource));
     json_object_set_new(line, "class", json_string(rc.class_name));
     json_object_set_new(line, "id", json_integer(wid));
-    json_array_append_new(r, line);
+
+    char *dump = json_dumps(line, JSON_COMPACT);
+    printf("%s\n", dump);
+    free(dump);
+    json_decref(line);
 
     free(host);
     free(name);
@@ -116,9 +126,4 @@ int main() {
     free(rc.class_name);
   }
   XFree(list.ids);
-
-  char *dump = json_dumps(r, JSON_COMPACT);
-  printf("%s\n", dump);
-  free(dump);
-  json_decref(r);
 }

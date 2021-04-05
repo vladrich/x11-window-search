@@ -1,19 +1,18 @@
 #!/usr/bin/env ruby
 
-require_relative './lib'
-include FvwmWindowSearch
 require 'yaml'
+require 'json'
 require 'optparse'
 
 def options
   default = {
-    "dmenu" => {               # each key is a corresponding CL option
-      "selhook" => File.join(__dir__, "focus.sh %s"),
-      "selhook-return-key-focus-only" => false,
+    "dmenu" => { # each key corresponds to a dmenu CL option, except for selhook*
       "fn" => "Monospace-10",
       "l" => 8,
       "b" => true,
       "i" => true,
+      "selhook" => File.join(__dir__, "focus.sh %s"),
+      "selhook-return-key-focus-only" => false, # FIXME: rename
     },
     "filter-out" => {
       "name" => [],
@@ -22,34 +21,39 @@ def options
     }
   }
 
-  cl = options_load_cl
-  env = deep_merge(default, options_load_file(cl) || {})
-  deep_merge env, cl
+  args = options_command_line
+  file = options_config_file(args) || {}
+  deep_merge default, deep_merge(file, args)
 end
 
-def options_load_cl
+def options_command_line
   opt = { "dmenu" => {} }
   OptionParser.new do |o|
+    o.version = (eval File.read File.join __dir__, 'pkg.gemspec').version
     o.on("-c path", "an alternative path to conf.yaml") { |v| opt["conf"] = v }
-    o.on("-r", "focus a window only if Return is pressed") do
+    o.on("-r", "switch to a window only when <Return> is pressed") do
       opt["dmenu"]["selhook-return-key-focus-only"] = true
     end
   end.parse!
   opt
 end
 
-def options_load_file opt       # return nil if config wasn't found
-  conf = opt["conf"] || -> do
+def options_config_file opt
+  file = opt["conf"] || -> do
     xdg_config_home = ENV['XDG_CONFIG_HOME'] || File.expand_path('~/.config')
     File.join xdg_config_home, 'fvwm-window-search', 'conf.yaml'
   end.call
-  r = File.read conf rescue nil
-  YAML.load r, conf rescue errx 1, "invalid config: #{$!}" if r
+  r = File.read file rescue nil
+  YAML.load r, file rescue abort "invalid config: #{$!}" if r
 end
 
-def menu params, text
-  cmd = [File.join(__dir__, "_out/dmenu/dmenu")]
-  params = params.map do |k,v|
+def deep_merge first, second
+  merger = proc {|_,v1,v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+  first.merge(second, &merger)
+end
+
+def dmenu_cmd params
+  [File.join(__dir__, "_out/dmenu/dmenu")] + params.map do |k,v|
     k = "-"+k
     if !!v == v
       v ? k : nil
@@ -57,22 +61,46 @@ def menu params, text
       [k,v]
     end
   end.reject(&:nil?).flatten.map(&:to_s)
-  IO.popen(cmd + params, 'w') { |ios| ios.puts text }
+end
+
+def desired patterns, window
+  match = -> (type, value) {
+    include = patterns[type].select {|v| v[0] != '!'}
+    exclude = patterns[type].select {|v| v[0] == '!'}.map {|v| v[1..-1]}
+
+    exclude.each do |pattern|
+      return true if value.match pattern
+    end
+    include.each do |pattern|
+      return false if value.match pattern
+    end
+    true
+  }
+
+  match.call("class", window['class']) &&
+    match.call("resource", window['resource']) &&
+    match.call("name", window['name'])
 end
 
 def main
   opt = options
-  begin
-    winlist = windows_filter_out opt["filter-out"], windows
-  rescue RegexpError
-    errx 1, "filter-out: #{$!}"
-  end
-  winlist = winlist.map do |w|
-    desk = w['desk'] == -1 ? '*' : w['desk']
-    [desk, w['class'], w['name'], w['host'], '0x'+w['id'].to_s(16)].join ' | '
-  end.join "\n"
+  dmenu = IO.popen(dmenu_cmd(opt['dmenu']), 'r+')
 
-  menu opt["dmenu"], winlist
+  IO.popen(File.join(__dir__, '_out/winlist')).each_line do |line|
+    begin
+      w = JSON.parse line
+    rescue
+      dmenu.puts $!.to_s.gsub(/\n+/m, ' ') # let a user see an error
+      next
+    end
+
+    next unless desired opt['filter-out'], w
+
+    desk = w['desk'] == -1 ? '*' : w['desk']
+    dmenu.puts [desk, w['class'], w['name'], w['host'], '0x'+w['id'].to_s(16)].join ' | '
+  end
+
+  dmenu.close
 end
 
-main
+main if __FILE__== $0

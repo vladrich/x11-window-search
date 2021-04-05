@@ -1,35 +1,32 @@
-require_relative './lib'
-include FvwmWindowSearch
+load './fvwm-window-search'
 require 'minitest/autorun'
 
-class WindowList < Minitest::Test
+class Window < Minitest::Test
   def setup
-    @winlist = [
-      {
-        "desk" => -1,
-        "host" => "hm76",
-        "name" => "FvwmIconMan",
-        "resource" => "FvwmIconMan",
-        "class" => "FvwmIconMan",
-        "id" => 12582916
-      },
-      {
-        "desk" => -1,
-        "host" => "hm76",
-        "name" => "Desk 1",
-        "resource" => "FvwmPager",
-        "class" => "FvwmPager",
-        "id" => 20971523
-      },
-      {
-        "desk" => 0,
-        "host" => "hm76",
-        "name" => "mutt",
-        "resource" => "mutt",
-        "class" => "XTerm",
-        "id" => 41943054
-      },
-    ]
+    @fvwmiconman = {
+      "desk" => -1,
+      "host" => "hm76",
+      "name" => "FvwmIconMan",
+      "resource" => "FvwmIconMan",
+      "class" => "FvwmIconMan",
+      "id" => 12582916
+    }
+    @fvwmpager = {
+      "desk" => -1,
+      "host" => "hm76",
+      "name" => "Desk 1",
+      "resource" => "FvwmPager",
+      "class" => "FvwmPager",
+      "id" => 20971523
+    }
+    @xterm = {
+      "desk" => 0,
+      "host" => "hm76",
+      "name" => "mutt",
+      "resource" => "mutt",
+      "class" => "XTerm",
+      "id" => 41943054
+    }
   end
 
   def test_class
@@ -38,10 +35,9 @@ class WindowList < Minitest::Test
       "resource" => [],
       "class" => ['^Fvwm', '!^FvwmPager$']
     }
-    wl = windows_filter_out patterns, @winlist
-    assert_equal 2, wl.size
-    assert_equal 'Desk 1', wl[0]['name']
-    assert_equal 'mutt', wl[1]['name']
+    assert desired patterns, @xterm
+    assert desired patterns, @fvwmpager
+    refute desired patterns, @fvwmiconman
   end
 
   def test_class_and_name
@@ -50,9 +46,9 @@ class WindowList < Minitest::Test
       "resource" => [],
       "class" => ['^Fvwm', '!^FvwmPager$']
     }
-    wl = windows_filter_out patterns, @winlist
-    assert_equal 1, wl.size
-    assert_equal 'Desk 1', wl[0]['name']
+    refute desired patterns, @xterm
+    assert desired patterns, @fvwmpager
+    refute desired patterns, @fvwmiconman
   end
 
   def test_empty_patterns
@@ -61,8 +57,9 @@ class WindowList < Minitest::Test
       "resource" => [],
       "class" => []
     }
-    wl = windows_filter_out patterns, @winlist
-    assert_equal 3, wl.size
+    assert desired patterns, @xterm
+    assert desired patterns, @fvwmpager
+    assert desired patterns, @fvwmiconman
   end
 
 end
