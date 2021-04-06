@@ -5,6 +5,7 @@
 require 'yaml'
 require 'json'
 require 'optparse'
+require 'shellwords'
 
 def options
   default = {
@@ -86,9 +87,35 @@ def desired patterns, window
     match.call("name", window['name'])
 end
 
+def dmenu_max_text_len opt
+  cmd = "#{helper('fontinfo')} #{opt['dmenu']['fn'].shellescape} '@'"
+  desk_width, char_width = `#{cmd}`.split.map(&:to_i)
+  (desk_width - char_width*2) / char_width
+end
+
+def menu_line max_len, desk_indicator, w
+  desk = w['desk'] == -1 ? '*' : w['desk'].to_s
+  desktop = desk_indicator + desk
+  id = '0x'+w['id'].to_s(16)
+
+  c = ->(s, len) { s.size > len ? s[0...len-1] + '…' : s }
+
+  name_width = max_len - 4 - 10 - 10 - 9 - 4*3
+
+  "%-4s | %10s | %-#{name_width}s | %10s | %9s" % [
+    desktop,
+    c.call(w['class'], 10),
+    c.call(w['name'], name_width),
+    c.call(w['host'], 10),
+    c.call(id, 9)
+  ]
+end
+
 def main
   opt = options
   pp opt if $DEBUG
+
+  max_len = dmenu_max_text_len opt
   dmenu = IO.popen(dmenu_cmd(opt['dmenu']), 'r+')
 
   IO.popen(helper('winlist')).each_line do |line|
@@ -108,9 +135,7 @@ def main
 
     next unless desired opt['filter-out'], w
 
-    desk = w['desk'] == -1 ? '*' : w['desk'].to_s
-    dmenu.puts [desk_indicator + desk, w['class'],
-                w['name'], w['host'], '0x'+w['id'].to_s(16)].join ' | '
+    dmenu.puts menu_line(max_len, desk_indicator, w)
   end
 
   dmenu.close

@@ -24,6 +24,7 @@ END
     'lib.c',
     'activate.c',
     'winlist.c',
+    'fontinfo.c',
     'dmenu.patch',
     'Makefile',
     'README.md',
