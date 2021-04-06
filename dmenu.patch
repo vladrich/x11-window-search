@@ -14,19 +14,20 @@ index a03a95c..ee5cffb 100644
  $(OBJ): arg.h config.h config.mk drw.h
  
 diff --git a/config.def.h b/config.def.h
-index 1edb647..1920110 100644
+index 1edb647..65c831f 100644
 --- a/config.def.h
 +++ b/config.def.h
-@@ -21,3 +21,7 @@ static unsigned int lines      = 0;
+@@ -21,3 +21,8 @@ static unsigned int lines      = 0;
   * for example: " /?\"&[]"
   */
  static const char worddelimiters[] = " ";
 +
-+/* -selhook option; run a command on every selection */
++/* -selection_hook option; run a command on every selection */
 +static const char *selection_hook = NULL;
-+static int selection_hook_return_key_focus_only = 0;
++static int selection_hook_activation = 1;
++static int selection_hook_activation_return_key_only = 0;
 diff --git a/dmenu.c b/dmenu.c
-index 65f25ce..274668a 100644
+index 65f25ce..47a6b37 100644
 --- a/dmenu.c
 +++ b/dmenu.c
 @@ -304,6 +304,62 @@ movewordedge(int dir)
@@ -92,7 +93,45 @@ index 65f25ce..274668a 100644
  static void
  keypress(XKeyEvent *ev)
  {
-@@ -464,6 +520,7 @@ insert:
+@@ -410,6 +466,7 @@ insert:
+ 		insert(NULL, nextrune(-1) - cursor);
+ 		break;
+ 	case XK_End:
++		if (ev->state & ShiftMask) selection_hook_activation = 0;
+ 		if (text[cursor] != '\0') {
+ 			cursor = strlen(text);
+ 			break;
+@@ -429,6 +486,7 @@ insert:
+ 		cleanup();
+ 		exit(1);
+ 	case XK_Home:
++		if (ev->state & ShiftMask) selection_hook_activation = 0;
+ 		if (sel == matches) {
+ 			cursor = 0;
+ 			break;
+@@ -445,18 +503,21 @@ insert:
+ 			return;
+ 		/* fallthrough */
+ 	case XK_Up:
++		if (ev->state & ShiftMask) selection_hook_activation = 0;
+ 		if (sel && sel->left && (sel = sel->left)->right == curr) {
+ 			curr = prev;
+ 			calcoffsets();
+ 		}
+ 		break;
+ 	case XK_Next:
++		if (ev->state & ShiftMask) selection_hook_activation = 0;
+ 		if (!next)
+ 			return;
+ 		sel = curr = next;
+ 		calcoffsets();
+ 		break;
+ 	case XK_Prior:
++		if (ev->state & ShiftMask) selection_hook_activation = 0;
+ 		if (!prev)
+ 			return;
+ 		sel = curr = prev;
+@@ -464,6 +525,7 @@ insert:
  		break;
  	case XK_Return:
  	case XK_KP_Enter:
@@ -100,29 +139,40 @@ index 65f25ce..274668a 100644
  		puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
  		if (!(ev->state & ControlMask)) {
  			cleanup();
-@@ -572,6 +629,8 @@ run(void)
+@@ -481,6 +543,7 @@ insert:
+ 			return;
+ 		/* fallthrough */
+ 	case XK_Down:
++		if (ev->state & ShiftMask) selection_hook_activation = 0;
+ 		if (sel && sel->right && (sel = sel->right) == next) {
+ 			curr = next;
+ 			calcoffsets();
+@@ -572,6 +635,11 @@ run(void)
  			break;
  		case KeyPress:
  			keypress(&ev.xkey);
-+			if (!selection_hook_return_key_focus_only)
++			if (!selection_hook_activation_return_key_only &&
++				selection_hook_activation)
 +				selhook(selection_hook, sel);
++
++			selection_hook_activation = 1;
  			break;
  		case SelectionNotify:
  			if (ev.xselection.property == utf8)
-@@ -712,6 +771,8 @@ main(int argc, char *argv[])
+@@ -712,6 +780,8 @@ main(int argc, char *argv[])
  		else if (!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
  			fstrncmp = strncasecmp;
  			fstrstr = cistrstr;
-+		} else if (!strcmp(argv[i], "-selhook-return-key-focus-only")) {
-+			selection_hook_return_key_focus_only = 1;
++		} else if (!strcmp(argv[i], "-selection_hook_activation_return_key_only")) {
++			selection_hook_activation_return_key_only = 1;
  		} else if (i + 1 == argc)
  			usage();
  		/* these options take one argument */
-@@ -733,6 +794,8 @@ main(int argc, char *argv[])
+@@ -733,6 +803,8 @@ main(int argc, char *argv[])
  			colors[SchemeSel][ColFg] = argv[++i];
  		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
  			embed = argv[++i];
-+		else if (!strcmp(argv[i], "-selhook")) /* a command to run */
++		else if (!strcmp(argv[i], "-selection_hook")) /* a command to run */
 +			selection_hook = argv[++i];
  		else
  			usage();

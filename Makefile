@@ -2,7 +2,7 @@ out := _out
 dmenu := $(out)/dmenu
 dmenu.commit := 1a13d0465d1a6f4f74bc5b07b04c9bd542f20ba6
 
-all: $(out)/.dmenu.build $(out)/focus $(out)/winlist
+all: $(out)/.dmenu.build $(out)/activate $(out)/winlist
 
 $(out)/.dmenu.build: $(out)/.dmenu.$(dmenu.commit) dmenu.patch
 	patch -d $(dmenu) -p1 < dmenu.patch

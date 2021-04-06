@@ -8,13 +8,13 @@ require 'optparse'
 
 def options
   default = {
-    "dmenu" => { # each key corresponds to a dmenu CL option, except for selhook*
+    'dmenu' => { # each key corresponds to a dmenu CL option
       "fn" => "Monospace-10",
       "l" => 8,
       "b" => true,
       "i" => true,
-      "selhook" => File.join(__dir__, "focus.sh %s"),
-      "selhook-return-key-focus-only" => false, # FIXME: rename
+      'selection_hook' => File.join(__dir__, "activate.sh %s"),
+      'selection_hook_activation_return_key_only' => false,
     },
     "filter-out" => {
       "name" => [],
@@ -34,7 +34,7 @@ def options_command_line
     o.on("-c path", "an alternative path to conf.yaml") { |v| opt["conf"] = v }
     o.on('-d', 'list windows from the current desktop only') { opt['this_desk_only'] = true }
     o.on("-r", "switch to a window only when <Return> is pressed") do
-      opt["dmenu"]["selhook-return-key-focus-only"] = true
+      opt['dmenu']['selection_hook_activation_return_key_only'] = true
     end
   end.parse!
   opt

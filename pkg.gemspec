@@ -20,9 +20,9 @@ END
   s.homepage = 'https://github.com/gromnitsky/fvwm-window-search'
   s.license = 'MIT'
   s.files = [
-    'focus.sh',
+    'activate.sh',
     'lib.c',
-    'focus.c',
+    'activate.c',
     'winlist.c',
     'dmenu.patch',
     'Makefile',

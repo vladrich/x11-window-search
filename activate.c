@@ -67,7 +67,7 @@ bool window_center_mouse(Display *dpy, ulong id) {
 int main(int argc, char **argv) {
   Display *dpy = XOpenDisplay(getenv("DISPLAY"));
   if (!dpy) errx(1, "failed to open display %s", getenv("DISPLAY"));
-  if (argc != 2) errx(1, "usage: focus window-id");
+  if (argc != 2) errx(1, "usage: activate window-id");
 
   ulong id = str2id(argv[1]);
   if (!id) errx(1, "invalid window id: `%s`", argv[1]);

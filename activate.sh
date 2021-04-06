@@ -9,4 +9,4 @@ __filename=`readlink -f "$0"`
 __dirname=`dirname "${__filename}"`
 
 # shellcheck disable=2086
-${__dirname}/_out/focus $id
+${__dirname}/_out/activate $id

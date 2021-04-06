@@ -9,7 +9,7 @@ Incremental window search & immediate switch to the selected window
 
 * Should work w/ most EWMH-compliant stackings X11 window managers.
 * Filter by window name/resource/class.
-* List windows from the current desktop only.
+* Optionally list windows from the current desktop only.
 
 ## Reqs
 
@@ -31,6 +31,9 @@ Usage: fvwm-window-search [options]
     -r                          switch to a window only when <Return> is pressed
 ~~~
 
+To scroll in dmenu (using Up/Down/Home/End/PgUp/PgDown) without
+windows activation, hold <kbd>Shift</kbd>.
+
 To customise dmenu or filtering, create a yaml file
 `$XDG_CONFIG_HOME/fvwm-window-search/conf.yaml`, e.g.:
 
@@ -39,7 +42,7 @@ To customise dmenu or filtering, create a yaml file
 dmenu:
   fn: Monospace-12
   b: false
-  selhook-return-key-focus-only: true
+  selection_hook_activation_return_key_only: true
 filter-out:
     name: ['System Monitor']
     resource: []
@@ -47,8 +50,8 @@ filter-out:
 ~~~
 
 Subkeys in `dmenu` are the usual CLOs for
-[dmenu(1)][]. `selhook-return-key-focus-only` is an equivalent of `-r`
-CLO.
+[dmenu(1)][]. `selection_hook_activation_return_key_only` is an
+equivalent of `-r` CLO.
 
 [dmenu(1)]: https://manpages.debian.org/unstable/suckless-tools/dmenu.1.en.html
 
