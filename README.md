@@ -7,8 +7,9 @@ Incremental window search & immediate switch to the selected window
 
 ![demo](https://thumbs.gfycat.com/GenerousRingedFlicker-small.gif)
 
-* Should work w/ most stackings X11 window managers.
-* Filtering by window name/resource/class.
+* Should work w/ most EWMH-compliant stackings X11 window managers.
+* Filter by window name/resource/class.
+* List windows from the current desktop only.
 
 ## Reqs
 
@@ -25,8 +26,9 @@ doesn't interfere w/ a system-installed dmenu.
 ~~~
 $ ./fvwm-window-search -h
 Usage: fvwm-window-search [options]
-    -c path                      an alternative path to conf.yaml
-    -r                           switch to a window only when <Return> is pressed
+    -c path                     an alternative path to conf.yaml
+    -d                          list windows from the current desktop only
+    -r                          switch to a window only when <Return> is pressed
 ~~~
 
 To customise dmenu or filtering, create a yaml file

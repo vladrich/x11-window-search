@@ -6,9 +6,11 @@ Gem::Specification.new do |s|
   s.summary = "A window switcher: an interactive incremental windows search & selection for X Window"
   s.description = <<END
 A window switcher: search for windows interactively using a patched
-dmenu utility (comes with the gem). This was originally made for Fvwm,
-but it's been fully rewritten to work out-of-the-box with any stacking
-window manager. Requires a preinstalled jansson-devel C library.
+dmenu utility (the gem fetches & patches it during its installation).
+This was originally made for Fvwm, but it's been rewritten to work with
+any EWMH-compliant stacking window manager.
+
+Requires a preinstalled jansson-devel C library.
 
 It differs from rofi & co in that it activates (brings up) windows
 _during_ the search.

@@ -1,4 +1,6 @@
 #!/usr/bin/env -S ruby --disable-gems
+# coding: utf-8
+# frozen_string_literal: true
 
 require 'yaml'
 require 'json'
@@ -30,6 +32,7 @@ def options_command_line
   opt = { "dmenu" => {} }
   OptionParser.new do |o|
     o.on("-c path", "an alternative path to conf.yaml") { |v| opt["conf"] = v }
+    o.on('-d', 'list windows from the current desktop only') { opt['this_desk_only'] = true }
     o.on("-r", "switch to a window only when <Return> is pressed") do
       opt["dmenu"]["selhook-return-key-focus-only"] = true
     end
@@ -51,8 +54,10 @@ def deep_merge first, second
   first.merge(second, &merger)
 end
 
+def helper exe; File.join(__dir__, "_out/#{exe}"); end
+
 def dmenu_cmd params
-  [File.join(__dir__, "_out/dmenu/dmenu")] + params.map do |k,v|
+  [helper('dmenu/dmenu')] + params.map do |k,v|
     k = "-"+k
     if !!v == v
       v ? k : nil
@@ -86,7 +91,7 @@ def main
   pp opt if $DEBUG
   dmenu = IO.popen(dmenu_cmd(opt['dmenu']), 'r+')
 
-  IO.popen(File.join(__dir__, '_out/winlist')).each_line do |line|
+  IO.popen(helper('winlist')).each_line do |line|
     begin
       w = JSON.parse line
     rescue
@@ -94,10 +99,18 @@ def main
       next
     end
 
+    if opt['this_desk_only']
+      next unless w['desk_cur']
+      desk_indicator = ''
+    else
+      desk_indicator = w['desk_cur'] ? '→ ' : '  '
+    end
+
     next unless desired opt['filter-out'], w
 
-    desk = w['desk'] == -1 ? '*' : w['desk']
-    dmenu.puts [desk, w['class'], w['name'], w['host'], '0x'+w['id'].to_s(16)].join ' | '
+    desk = w['desk'] == -1 ? '*' : w['desk'].to_s
+    dmenu.puts [desk_indicator + desk, w['class'],
+                w['name'], w['host'], '0x'+w['id'].to_s(16)].join ' | '
   end
 
   dmenu.close

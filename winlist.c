@@ -93,6 +93,19 @@ char* wm_name(Display *dpy, Window wid) {
   return (char*)prop_val;
 }
 
+long desktop_current(Display *dpy) {
+  u_char *prop_val = NULL;
+  ulong prop_size;
+  long r = -1;
+  if (!prop(dpy, DefaultRootWindow(dpy), XA_CARDINAL, "_NET_CURRENT_DESKTOP",
+            &prop_val, &prop_size))
+    return r;
+
+  if (prop_val) r = ((long*)prop_val)[0];
+  free(prop_val);
+  return r;
+}
+
 
 
 int main() {
@@ -106,9 +119,12 @@ int main() {
     char *host = wm_client_machine(dpy, wid);
     char *name = wm_name(dpy, wid);
     ResClass rc = wm_class(dpy, wid);
+    long desk = desktop(dpy, wid);
+    bool is_desk_cur = desk < 0 || desk == desktop_current(dpy);
 
     json_t *line = json_object();
-    json_object_set_new(line, "desk", json_integer(desktop(dpy, wid)));
+    json_object_set_new(line, "desk", json_integer(desk));
+    json_object_set_new(line, "desk_cur", json_boolean(is_desk_cur));
     json_object_set_new(line, "host", json_string(host));
     json_object_set_new(line, "name", json_string(name));
     json_object_set_new(line, "resource", json_string(rc.resource));
