@@ -48,9 +48,15 @@ bool window_activate(Display *dpy, Window id) {
                desk, 0, 0, 0, 0);
   }
 
-  bool r = client_msg(dpy, id, "_NET_ACTIVE_WINDOW", 0, 0, 0, 0, 0);
+  bool active = client_msg(dpy, id, "_NET_ACTIVE_WINDOW", 0, 0, 0, 0, 0);
+
+  const int _net_wm_state_rm = 0;
+  Atom prop_shaded = XInternAtom(dpy, "_NET_WM_STATE_SHADED", False);
+  bool unshaded = client_msg(dpy, id, "_NET_WM_STATE",
+                             _net_wm_state_rm, prop_shaded, 0, 0, 0);
+
   XMapRaised(dpy, id);
-  return r;
+  return active && unshaded;
 }
 
 bool window_center_mouse(Display *dpy, ulong id) {
