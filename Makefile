@@ -16,10 +16,11 @@ $(out)/.dmenu.$(dmenu.commit):
 
 libs := x11
 LDFLAGS = $(shell pkg-config --libs $(libs))
-CFLAGS = -g -Wall $(shell pkg-config --cflags $(libs))
+CFLAGS = -g -Wall -Werror $(shell pkg-config --cflags $(libs))
 $(out)/%: %.c lib.c
 	$(LINK.c) $< $(LOADLIBES) $(LDLIBS) -o $@
 
+$(out)/activate: libs += jansson
 $(out)/winlist: libs += jansson
 $(out)/fontinfo: libs += xft freetype2
 

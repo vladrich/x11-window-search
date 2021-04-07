@@ -85,8 +85,7 @@ char* wm_name(Display *dpy, Window wid) {
   u_char *prop_val = NULL;
   ulong prop_size;
 
-  Atom utf8_str = XInternAtom(dpy, "UTF8_STRING", False);
-  bool r = prop(dpy, wid, utf8_str, "_NET_WM_NAME", &prop_val, &prop_size);
+  bool r = prop(dpy, wid, myAtoms.UTF8_STRING, "_NET_WM_NAME", &prop_val, &prop_size);
   if (r && prop_val) return (char*)prop_val;
 
   prop(dpy, wid, XA_STRING, "WM_NAME", &prop_val, &prop_size);
@@ -111,6 +110,7 @@ long desktop_current(Display *dpy) {
 int main() {
   Display *dpy = XOpenDisplay(getenv("DISPLAY"));
   if (!dpy) errx(1, "failed to open display %s", getenv("DISPLAY"));
+  mk_atoms(dpy);
 
   WinList list = winlist(dpy);
   for (ulong idx = 0; idx < list.size; idx++) {

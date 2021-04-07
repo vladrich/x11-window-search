@@ -22,3 +22,39 @@ long desktop(Display *dpy, Window wid) {
   free(prop_val);
   return r;
 }
+
+typedef struct {
+  bool _NET_WM_STATE_SHADED;
+  bool _NET_WM_STATE_HIDDEN;
+  Window id;
+} WindowState;
+
+typedef struct {
+  Atom _NET_WM_STATE_SHADED;
+  Atom _NET_WM_STATE_HIDDEN;
+  Atom UTF8_STRING;
+} MyAtoms;
+
+MyAtoms myAtoms;
+
+void mk_atoms(Display *dpy) {
+  myAtoms._NET_WM_STATE_SHADED = XInternAtom(dpy, "_NET_WM_STATE_SHADED", False);
+  myAtoms._NET_WM_STATE_HIDDEN = XInternAtom(dpy, "_NET_WM_STATE_HIDDEN", False);
+  myAtoms.UTF8_STRING = XInternAtom(dpy, "UTF8_STRING", False);
+}
+
+WindowState state(Display *dpy, Window id) {
+  WindowState r = { .id = id };
+  u_char *prop_val = NULL;
+  ulong prop_size;
+  if (!prop(dpy, id, XA_ATOM, "_NET_WM_STATE", &prop_val, &prop_size)) return r;
+
+  Atom *atoms = (Atom*)prop_val;
+  for (int idx = 0; idx < prop_size; idx++) {
+    if (atoms[idx] == myAtoms._NET_WM_STATE_SHADED) r._NET_WM_STATE_SHADED = true;
+    if (atoms[idx] == myAtoms._NET_WM_STATE_HIDDEN) r._NET_WM_STATE_HIDDEN = true;
+  }
+  XFree(prop_val);
+
+  return r;
+}
