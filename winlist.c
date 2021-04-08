@@ -14,6 +14,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#include <X11/Xutil.h>
 #include <jansson.h>
 
 #include "lib.c"
@@ -42,40 +43,15 @@ char* wm_client_machine(Display *dpy, Window wid) {
   u_char *prop_val = NULL;
   ulong prop_size;
   prop(dpy, wid, XA_STRING, "WM_CLIENT_MACHINE", &prop_val, &prop_size);
-  return (char*)prop_val;
+  return prop_val ? (char*)prop_val : strdup("nil");
 }
 
-ulong str_index(const char *s, char ch) {
-  const char *p = strchr(s, ch);
-  if (!p) return -1;
-  return (ulong)(p - s);
-}
-
-typedef struct {
-  char *resource;
-  char *class_name;
-} ResClass;
-
-// result (ResClass.*) should be freed
-ResClass wm_class(Display *dpy, Window wid) {
-  ResClass r = {.resource = NULL};
-
-  u_char *prop_val = NULL;
-  ulong prop_size;
-  if (!prop(dpy, wid, XA_STRING, "WM_CLASS", &prop_val, &prop_size))
-    return r;
-
-  ulong idx = str_index((char*)prop_val, '\0');
-  if (idx < prop_size) {
-    r.resource = (char*)malloc(idx+2);
-    snprintf(r.resource, idx+1, "%s", prop_val);
-
-    ulong len = prop_size-idx;
-    r.class_name = (char*)malloc(len+1);
-    snprintf(r.class_name, len, "%s", prop_val+idx+1);
-  }
-
-  free(prop_val);
+// result (XClassHint.*) should be freed
+XClassHint wm_class(Display *dpy, Window wid) {
+  XClassHint r = { .res_name = NULL };
+  XGetClassHint(dpy, wid, &r);
+  if (!r.res_name) r.res_name = strdup("nil");
+  if (!r.res_class) r.res_class = strdup("nil");
   return r;
 }
 
@@ -88,7 +64,7 @@ char* wm_name(Display *dpy, Window wid) {
   if (r && prop_val) return (char*)prop_val;
 
   prop(dpy, wid, XA_STRING, "WM_NAME", &prop_val, &prop_size);
-  return (char*)prop_val;
+  return prop_val ? (char*)prop_val : strdup("nil");
 }
 
 long desktop_current(Display *dpy) {
@@ -117,7 +93,7 @@ int main() {
 
     char *host = wm_client_machine(dpy, wid);
     char *name = wm_name(dpy, wid);
-    ResClass rc = wm_class(dpy, wid);
+    XClassHint rc = wm_class(dpy, wid);
     long desk = desktop(dpy, wid);
     bool is_desk_cur = desk < 0 || desk == desktop_current(dpy);
 
@@ -126,8 +102,8 @@ int main() {
     json_object_set_new(line, "desk_cur", json_boolean(is_desk_cur));
     json_object_set_new(line, "host", json_string(host));
     json_object_set_new(line, "name", json_string(name));
-    json_object_set_new(line, "resource", json_string(rc.resource));
-    json_object_set_new(line, "class", json_string(rc.class_name));
+    json_object_set_new(line, "resource", json_string(rc.res_name));
+    json_object_set_new(line, "class", json_string(rc.res_class));
     json_object_set_new(line, "id", json_integer(wid));
 
     char *dump = json_dumps(line, JSON_COMPACT);
@@ -137,8 +113,8 @@ int main() {
 
     free(host);
     free(name);
-    free(rc.resource);
-    free(rc.class_name);
+    free(rc.res_name);
+    free(rc.res_class);
   }
   XFree(list.ids);
 }
