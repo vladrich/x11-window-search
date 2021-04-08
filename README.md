@@ -10,11 +10,12 @@ Incremental window search & immediate switch to the selected window
 * Should work w/ most EWMH-compliant stackings X11 window managers.
 * Filter by window name/resource/class.
 * Optionally list windows from the current desktop only.
+* Preserve minimised/shaded window states.
 
 ## Reqs
 
 * Ruby 2.1+
-* `dnf install jansson-devel`
+* `dnf install jansson-devel freetype-devel`
 
 ## Compilation
 
@@ -68,11 +69,6 @@ run `./fvwm-window-search` directly from the repo.
 This is not the case with rubygems! The latter generates a stub script
 that invokes `./fvwm-window-search` file. This indirection may add
 ~140ms of additional delay.
-
-## Bugs
-
-* Tested only w/ Fvwm3.
-* No distinction between normal & iconified windows.
 
 ## License
 
