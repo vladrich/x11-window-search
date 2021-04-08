@@ -125,7 +125,6 @@ Window state_load(Display *dpy, Window  id_current) {
   free(file);
   if (!root) return 0;
 
-  bool change_layer = true;
   Window id = json_integer_value(json_object_get(root, "id"));
   if (id == id_current) return id;
 
@@ -136,9 +135,6 @@ Window state_load(Display *dpy, Window  id_current) {
   bool is_hidden = json_boolean_value(json_object_get(root, "_NET_WM_STATE_HIDDEN"));
   if (is_hidden) client_msg(dpy, id, "_NET_WM_STATE", _net_wm_state_add,
                             myAtoms._NET_WM_STATE_HIDDEN, 0, 0, 0);
-
-  if (is_shaded || is_hidden) change_layer = false;
-  if (change_layer) XLowerWindow(dpy, id); /* FIXME */
 
   json_decref(root);
   return id;
