@@ -25,12 +25,11 @@ typedef struct {
 
 // result (WinList.ids) should be freed
 WinList winlist(Display *dpy) {
-  WinList list;
+  WinList list = { .ids = NULL };
   u_char *result;
 
-  if (!prop(dpy, DefaultRootWindow(dpy), XA_WINDOW, "_NET_CLIENT_LIST",
+  if (!prop(dpy, DefaultRootWindow(dpy), XA_WINDOW, "_NET_CLIENT_LIST_STACKING",
             &result, &list.size)) {
-    list.size = -1;
     return list;
   }
 
@@ -113,7 +112,7 @@ int main() {
   mk_atoms(dpy);
 
   WinList list = winlist(dpy);
-  for (ulong idx = 0; idx < list.size; idx++) {
+  for (long idx = list.size-1; idx >= 0; idx--) {
     ulong wid = list.ids[idx];
 
     char *host = wm_client_machine(dpy, wid);
