@@ -24,7 +24,7 @@ ulong str2id(const char *s) {
     return id;
 }
 
-bool client_msg(Display *dpy, Window id, char *msg,
+bool client_msg(Display *dpy, Window id, const char *msg,
                 unsigned long data0, unsigned long data1,
                 unsigned long data2, unsigned long data3,
                 unsigned long data4) {
@@ -119,7 +119,7 @@ void state_save(Display *dpy, Window id) {
   close(fd);
 }
 
-Window state_load(Display *dpy) {
+Window state_load(Display *dpy, Window  id_current) {
   char *file = config();
   json_t *root = json_load_file(file, 0, NULL);
   free(file);
@@ -127,8 +127,9 @@ Window state_load(Display *dpy) {
 
   bool change_layer = true;
   Window id = json_integer_value(json_object_get(root, "id"));
-  const int _net_wm_state_add = 1;
+  if (id == id_current) return id;
 
+  const int _net_wm_state_add = 1;
   bool is_shaded = json_boolean_value(json_object_get(root, "_NET_WM_STATE_SHADED"));
   if (is_shaded) client_msg(dpy, id, "_NET_WM_STATE", _net_wm_state_add,
                             myAtoms._NET_WM_STATE_SHADED, 0, 0, 0);
@@ -155,7 +156,7 @@ int main(int argc, char **argv) {
   ulong id = str2id(argv[1]);
   if (!id) errx(1, "invalid window id: `%s`", argv[1]);
 
-  Window prev_id = state_load(dpy);
+  Window prev_id = state_load(dpy, id);
   if (prev_id != id) state_save(dpy, id);
 
   XSynchronize(dpy, True); // snake oil?

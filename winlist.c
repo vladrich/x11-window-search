@@ -47,7 +47,7 @@ char* wm_client_machine(Display *dpy, Window wid) {
 }
 
 ulong str_index(const char *s, char ch) {
-  char *p = strchr(s, ch);
+  const char *p = strchr(s, ch);
   if (!p) return -1;
   return (ulong)(p - s);
 }
