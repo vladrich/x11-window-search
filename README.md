@@ -5,7 +5,7 @@ Incremental window search & immediate switch to the selected window
 
     $ gem install fvwm-window-search
 
-![demo](https://thumbs.gfycat.com/GenerousRingedFlicker-small.gif)
+![demo](https://sigwait.tk/~alex/junk/fvwm-window-search-2.2.0.gif)
 
 * Should work w/ most EWMH-compliant stackings X11 window managers.
 * Filter by window name/resource/class.
