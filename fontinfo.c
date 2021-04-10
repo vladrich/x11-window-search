@@ -3,8 +3,6 @@
 #include <stdbool.h>
 #include <err.h>
 #include <X11/Xft/Xft.h>
-#include <X11/Xatom.h>
-
 #include "lib.c"
 
 long desktop_width(Display *dpy) {

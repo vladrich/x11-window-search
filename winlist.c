@@ -5,15 +5,11 @@
   {"desk":0,"host":"hm76","name":"xterm","resource":"xterm","class":"XTerm","id":67108878}
 */
 
-#include <stdlib.h>
 #include <err.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <string.h>
 #include <math.h>
 
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
 #include <X11/Xutil.h>
 #include <jansson.h>
 

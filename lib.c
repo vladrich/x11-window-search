@@ -1,3 +1,11 @@
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <sys/stat.h>
+
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+
 bool prop(Display *dpy, Window wid, Atom expected_type, const char *name,
           u_char **result, ulong *size) {
   Atom type;
@@ -57,4 +65,33 @@ WindowState state(Display *dpy, Window id) {
   XFree(prop_val);
 
   return r;
+}
+
+bool mkdir_p(const char *s, mode_t mode) {
+  char *component = strdup(s);
+  char *p = component;
+
+  bool status = true;
+  while (*p && *p == '/') p++; // skip leading '/'
+
+  do {
+    while (*p && *p != '/') p++;
+
+    if (!*p)
+      p = NULL;
+    else
+      *p = '\0';
+
+    if (-1 == mkdir(component, mode) && errno != EEXIST) {
+      status = false;
+      break;
+    } else if (p) {
+      *p++ = '/';
+      while (*p && *p == '/') p++;
+    }
+
+  } while (p);
+
+  free(component);
+  return status;
 }

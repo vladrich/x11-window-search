@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <err.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -7,11 +6,7 @@
 #include <string.h>
 #include <limits.h>
 #include <libgen.h>
-#include <sys/stat.h>
-#include <errno.h>
 
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
 #include <jansson.h>
 
 #include "lib.c"
@@ -88,8 +83,7 @@ char* config() {
            xdg_runtime_home, "fvwm-window-search", "last_window.json");
 
   char *dir = dirname(strdup(file));
-  mkdir(xdg_runtime_home, 0755);
-  int r = mkdir(dir, 0755); if (-1 == r && EEXIST != errno) {
+  if (!mkdir_p(dir, 0700)) {
     warn("failed to create %s", dir);
     return NULL;
   }
@@ -99,7 +93,7 @@ char* config() {
 
 void state_save(Display *dpy, Window id) {
   char *file = config();
-  int fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644); if (-1 == fd) {
+  int fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0600); if (-1 == fd) {
     warn("failed to truncate %s", file);
     return;
   }
