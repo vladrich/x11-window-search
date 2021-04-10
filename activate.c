@@ -6,6 +6,7 @@
 #include <string.h>
 #include <limits.h>
 #include <libgen.h>
+#include <sys/utsname.h>
 
 #include <jansson.h>
 
@@ -76,7 +77,10 @@ char* config() {
   if (getenv("XDG_RUNTIME_HOME")) {
     snprintf(xdg_runtime_home, PATH_MAX-64, "%s", getenv("XDG_RUNTIME_HOME"));
   } else {
-    snprintf(xdg_runtime_home, PATH_MAX-64, "/run/user/%d", getuid());
+    struct utsname info;
+    uname(&info);
+    char *template = 0 == strcmp(info.sysname, "Linux") ? "/run/user/%d" : "/tmp/user/%d";
+    snprintf(xdg_runtime_home, PATH_MAX-64, template, getuid());
   }
   char *file = (char*)malloc(PATH_MAX);
   snprintf(file, PATH_MAX, "%s/%s/%s",
