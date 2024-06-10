@@ -7,10 +7,13 @@
 #include <limits.h>
 #include <libgen.h>
 #include <sys/utsname.h>
+#include <X11/Xlib.h>
 
-#include <jansson.h>
+#include "xw.h"
 
-#include "lib.c"
+extern long desktop(Display *dpy, Window wid);
+extern void mk_atoms(Display *dpy);
+extern MyAtoms myAtoms;
 
 ulong str2id(const char *s) {
     ulong id;
@@ -71,87 +74,15 @@ bool window_center_mouse(Display *dpy, ulong id) {
   return true;
 }
 
-// the result shout be freed
-char* config() {
-  char xdg_runtime_home[PATH_MAX-64];
-  if (getenv("XDG_RUNTIME_HOME")) {
-    snprintf(xdg_runtime_home, PATH_MAX-64, "%s", getenv("XDG_RUNTIME_HOME"));
-  } else {
-    struct utsname info;
-    uname(&info);
-    char *template = 0 == strcmp(info.sysname, "Linux") ? "/run/user/%d" : "/tmp/user/%d";
-    snprintf(xdg_runtime_home, PATH_MAX-64, template, getuid());
-  }
-  char *file = (char*)malloc(PATH_MAX);
-  snprintf(file, PATH_MAX, "%s/%s/%s",
-           xdg_runtime_home, "fvwm-window-search", "last_window.json");
 
-  char *dir = dirname(strdup(file));
-  if (!mkdir_p(dir, 0700)) {
-    warn("failed to create %s", dir);
-    return NULL;
-  }
-  free(dir);
-  return file;
-}
-
-void state_save(Display *dpy, Window id) {
-  char *file = config();
-  int fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0600); if (-1 == fd) {
-    warn("failed to truncate %s", file);
-    return;
-  }
-  free(file);
-
-  WindowState ws = state(dpy, id);
-  json_t *o = json_object();
-  json_object_set_new(o, "id", json_integer(ws.id));
-  json_object_set_new(o, "_NET_WM_STATE_SHADED", json_boolean(ws._NET_WM_STATE_SHADED));
-  json_object_set_new(o, "_NET_WM_STATE_HIDDEN", json_boolean(ws._NET_WM_STATE_HIDDEN));
-
-  char *dump = json_dumps(o, JSON_COMPACT);
-  write(fd, dump, strlen(dump));
-  free(dump);
-  json_decref(o);
-
-  close(fd);
-}
-
-Window state_load(Display *dpy, Window  id_current) {
-  char *file = config();
-  json_t *root = json_load_file(file, 0, NULL);
-  free(file);
-  if (!root) return 0;
-
-  Window id = json_integer_value(json_object_get(root, "id"));
-  if (id == id_current) return id;
-
-  const int _net_wm_state_add = 1;
-  bool is_shaded = json_boolean_value(json_object_get(root, "_NET_WM_STATE_SHADED"));
-  if (is_shaded) client_msg(dpy, id, "_NET_WM_STATE", _net_wm_state_add,
-                            myAtoms._NET_WM_STATE_SHADED, 0, 0, 0);
-  bool is_hidden = json_boolean_value(json_object_get(root, "_NET_WM_STATE_HIDDEN"));
-  if (is_hidden) client_msg(dpy, id, "_NET_WM_STATE", _net_wm_state_add,
-                            myAtoms._NET_WM_STATE_HIDDEN, 0, 0, 0);
-
-  json_decref(root);
-  return id;
-}
-
-
-
-int main(int argc, char **argv) {
-  Display *dpy = XOpenDisplay(getenv("DISPLAY"));
-  if (!dpy) errx(1, "failed to open display %s", getenv("DISPLAY"));
-  if (argc != 2) errx(1, "usage: activate window-id");
-
+int wrap_window_activate(Display *dpy, char *s) {
   mk_atoms(dpy);
 
-  ulong id = str2id(argv[1]);
-  if (!id) errx(1, "invalid window id: `%s`", argv[1]);
+  ulong id = str2id(s);
+  if (!id) errx(1, "invalid window id: `%s`", s);
 
-  Window prev_id = state_load(dpy, id);
-  if (prev_id != id) state_save(dpy, id);
+  //Window prev_id = state_load(dpy, id);
+  //if (prev_id != id) state_save(dpy, id);
 
   XSynchronize(dpy, True); // snake oil?
   bool r = window_activate(dpy, id);

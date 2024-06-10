@@ -7,3 +7,9 @@
 
 void die(const char *fmt, ...);
 void *ecalloc(size_t nmemb, size_t size);
+
+struct item {
+	char *text;
+	struct item *left, *right;
+	int out;
+};

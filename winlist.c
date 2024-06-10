@@ -11,9 +11,13 @@
 #include <math.h>
 
 #include <X11/Xutil.h>
-#include <jansson.h>
 
 #include "lib.c"
+#include "util.h"
+
+extern struct item *items;
+extern unsigned int lines;
+
 
 typedef struct {
   Window *ids;
@@ -76,15 +80,22 @@ long desktop_current(Display *dpy) {
   return r;
 }
 
-
 
-int main() {
-  Display *dpy = XOpenDisplay(getenv("DISPLAY"));
-  if (!dpy) errx(1, "failed to open display %s", getenv("DISPLAY"));
+
+int get_windows(Display *dpy) {
   mk_atoms(dpy);
 
+  size_t i = 0;
+  size_t itemsiz = 0;
+
+  //printf("id,desk,desk_cur,host,name,resource,class\n");
+
   WinList list = winlist(dpy);
-  for (long idx = list.size-1; idx >= 0; idx--) {
+  for (long idx = list.size-1; idx >= 0; i++, idx--) {
+
+    char *line = NULL;
+    size_t linesiz = 0;
+
     ulong wid = list.ids[idx];
 
     char *host = wm_client_machine(dpy, wid);
@@ -93,24 +104,51 @@ int main() {
     long desk = desktop(dpy, wid);
     bool is_desk_cur = desk < 0 || desk == desktop_current(dpy);
 
-    json_t *line = json_object();
-    json_object_set_new(line, "desk", json_integer(desk));
-    json_object_set_new(line, "desk_cur", json_boolean(is_desk_cur));
-    json_object_set_new(line, "host", json_string(host));
-    json_object_set_new(line, "name", json_string(name));
-    json_object_set_new(line, "resource", json_string(rc.res_name));
-    json_object_set_new(line, "class", json_string(rc.res_class));
-    json_object_set_new(line, "id", json_integer(wid));
+    //printf("%lu,%ld,%d,%s,%s,%s,%s\n", wid, desk, is_desk_cur, host, name, rc.res_name, rc.res_class);
 
-    char *dump = json_dumps(line, JSON_COMPACT);
-    printf("%s\n", dump);
-    free(dump);
-    json_decref(line);
+    /* Determine required size */
+
+    char *fmt = "%10lu    %-10.10s  %s\n";
+
+    linesiz = snprintf(line, linesiz, fmt, wid, rc.res_class, name);
+
+    if (linesiz < 0)
+        return -1;
+
+    linesiz++;             /* For '\0' */
+    line = malloc(linesiz);
+    if (line == NULL)
+        return -1;
+
+    linesiz = snprintf(line, linesiz, fmt, wid, rc.res_class, name);
+
+    if (linesiz < 0) {
+        free(line);
+        return -1;
+    }
+
+
+    if (i + 1 >= itemsiz) {
+	    itemsiz += 256;
+	    if (!(items = realloc(items, itemsiz * sizeof(*items))))
+		    die("cannot realloc %zu bytes:", itemsiz * sizeof(*items));
+    }
+    if (line[linesiz - 1] == '\n')
+	    line[linesiz - 1] = '\0';
+    items[i].text = line;
+
+    items[i].out = 0;
+
+
 
     free(host);
     free(name);
     free(rc.res_name);
     free(rc.res_class);
   }
+  if (items)
+    items[i].text = NULL;
+  lines = MIN(lines, i);
   XFree(list.ids);
+  return lines;
 }

@@ -6,6 +6,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
+#include "xw.h"
+
 bool prop(Display *dpy, Window wid, Atom expected_type, const char *name,
           u_char **result, ulong *size) {
   Atom type;
@@ -30,18 +32,6 @@ long desktop(Display *dpy, Window wid) {
   free(prop_val);
   return r;
 }
-
-typedef struct {
-  bool _NET_WM_STATE_SHADED;
-  bool _NET_WM_STATE_HIDDEN;
-  Window id;
-} WindowState;
-
-typedef struct {
-  Atom _NET_WM_STATE_SHADED;
-  Atom _NET_WM_STATE_HIDDEN;
-  Atom UTF8_STRING;
-} MyAtoms;
 
 MyAtoms myAtoms;
 

@@ -27,19 +27,13 @@
 /* enums */
 enum { SchemeNorm, SchemeSel, SchemeOut, SchemeLast }; /* color schemes */
 
-struct item {
-	char *text;
-	struct item *left, *right;
-	int out;
-};
-
 static char text[BUFSIZ] = "";
 static char *embed;
 static int bh, mw, mh;
 static int inputw = 0, promptw;
 static int lrpad; /* sum of left and right padding */
 static size_t cursor;
-static struct item *items = NULL;
+struct item *items = NULL;
 static struct item *matches, *matchend;
 static struct item *prev, *curr, *next, *sel;
 static int mon = -1, screen;
@@ -56,6 +50,11 @@ static Clr *scheme[SchemeLast];
 
 static int (*fstrncmp)(const char *, const char *, size_t) = strncmp;
 static char *(*fstrstr)(const char *, const char *) = strstr;
+
+extern int get_windows(Display *dpy);
+extern int wrap_window_activate(Display *dpy, char *s);
+
+
 
 static unsigned int
 textw_clamp(const char *str, unsigned int n)
@@ -490,6 +489,7 @@ insert:
 	case XK_Return:
 	case XK_KP_Enter:
 		puts((sel && !(ev->state & ShiftMask)) ? sel->text : text);
+                wrap_window_activate(dpy, (sel && !(ev->state & ShiftMask)) ? sel->text : text);
 		if (!(ev->state & ControlMask)) {
 			cleanup();
 			exit(0);
@@ -543,33 +543,6 @@ paste(void)
 		XFree(p);
 	}
 	drawmenu();
-}
-
-static void
-readstdin(void)
-{
-	char *line = NULL;
-	size_t i, itemsiz = 0, linesiz = 0;
-	ssize_t len;
-
-	/* read each line from stdin and add it to the item list */
-	for (i = 0; (len = getline(&line, &linesiz, stdin)) != -1; i++) {
-		if (i + 1 >= itemsiz) {
-			itemsiz += 256;
-			if (!(items = realloc(items, itemsiz * sizeof(*items))))
-				die("cannot realloc %zu bytes:", itemsiz * sizeof(*items));
-		}
-		if (line[len - 1] == '\n')
-			line[len - 1] = '\0';
-		if (!(items[i].text = strdup(line)))
-			die("strdup:");
-
-		items[i].out = 0;
-	}
-	free(line);
-	if (items)
-		items[i].text = NULL;
-	lines = MIN(lines, i);
 }
 
 static void
@@ -784,9 +757,9 @@ main(int argc, char *argv[])
 
 	if (fast && !isatty(0)) {
 		grabkeyboard();
-		readstdin();
+		get_windows(dpy);
 	} else {
-		readstdin();
+		get_windows(dpy);
 		grabkeyboard();
 	}
 	setup();
