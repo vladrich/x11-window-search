@@ -1,12 +1,9 @@
-# dmenu - dynamic menu
-# See LICENSE file for copyright and license details.
-
 include config.mk
 
 SRC = drw.c dmenu.c util.c winlist.c lib.c activate.c
 OBJ = $(SRC:.c=.o)
 
-all: dmenu
+all: x11-window-search
 
 .c.o:
 	$(CC) -c $(CFLAGS) $<
@@ -16,27 +13,27 @@ config.h:
 
 $(OBJ): arg.h config.h config.mk drw.h xw.h
 
-dmenu: dmenu.o drw.o util.o winlist.o activate.o
+x11-window-search: dmenu.o drw.o util.o winlist.o activate.o
 	$(CC) -o $@ dmenu.o drw.o util.o winlist.o activate.o $(LDFLAGS)
 
 clean:
-	rm -f dmenu $(OBJ) dmenu-$(VERSION).tar.gz
+	rm -f x11-window-search $(OBJ) x11-window-search-$(VERSION).tar.gz
 
 dist: clean
-	mkdir -p dmenu-$(VERSION)
-	cp LICENSE Makefile README arg.h config.def.h config.mk\
+	mkdir -p x11-window-search-$(VERSION)
+	cp LICENSE Makefile README.md arg.h config.def.h config.mk\
 		drw.h util.h xw.h $(SRC)\
-		dmenu-$(VERSION)
-	tar -cf dmenu-$(VERSION).tar dmenu-$(VERSION)
-	gzip dmenu-$(VERSION).tar
-	rm -rf dmenu-$(VERSION)
+		x11-window-search-$(VERSION)
+	tar -cf x11-window-search-$(VERSION).tar x11-window-search-$(VERSION)
+	gzip x11-window-search-$(VERSION).tar
+	rm -rf x11-window-search-$(VERSION)
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	cp -f dmenu $(DESTDIR)$(PREFIX)/bin
-	chmod 755 $(DESTDIR)$(PREFIX)/bin/dmenu
+	cp -f x11-window-search $(DESTDIR)$(PREFIX)/bin
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/x11-window-search
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/dmenu
+	rm -f $(DESTDIR)$(PREFIX)/bin/x11-window-search
 
 .PHONY: all clean dist install uninstall

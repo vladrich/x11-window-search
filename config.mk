@@ -1,5 +1,5 @@
 # dmenu version
-VERSION = 5.3
+VERSION = $(shell git log -1 --pretty=format:"%h")
 
 # paths
 PREFIX = /usr/local

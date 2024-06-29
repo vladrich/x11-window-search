@@ -1,1 +1,5 @@
 _out
+config.h
+*.o
+x11-window-search
+
